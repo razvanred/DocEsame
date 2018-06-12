@@ -11,7 +11,18 @@ Io mi sono occupato dell'applicativo Android (grazie alle esperienze passate con
 
 L'applicazione Android, dopo aver effettuato il login con successo, va a scaricare  e salvare i dati all'interno di un database interno (mediante richieste GET). Le tabelle verranno aggiornate solamente se è stato effettuato qualche cambiamento dal portale o da un altro dispositivo. Dovrà dunque essere in grado di inviare nuovi ordini, visite e clienti effettuando le opportune rcihieste al servizio REST.
 
-## Il servizio REST
+Possiamo dire che io ed il mio compagno ci siamo occupati di costruire _una parte_ del **S**istema **I**nformativo **A**ziendale, il quale è un sistema informatico che fa parte della tecnostruttura dell'azienda. Tra i tradizionali flussi aziendali oggigiorno assume sempre più importanza il flusso dell'informazione, ovvero quel bene intangibile che fa scaturire delle attività gestionali. La gestione delle informazioni è delegata ad un Sistema Informatico, solitamente finalizzato a:
+
+* migliorare i processi produttivi di un'azienda (come un sistema ERP, con cui il nostro lavoro non va direttamente ad interferire)
+* costruire e gestire un patrimonio informativo mediante strumenti come un Web Information System
+* Innovare sia i prodotti che i processi produttivi
+
+Sono considerati parte del SIA anche tutti quei prodotti software di produttività individuale (in questo caso, l'applicazione Android per gli agenti, oppure strumenti da ufficio come la suite di Microsoft Office).
+
+Dato che durante il corso dell'anno sono state rilasciate diverse versioni dell'applicazione, verso marzo 2017 ho costruito una piccola RESTful API (scritta in Node.JS): dato che l'applicazione non si trova in alcun _app marketplace_ (come quello ufficiale, il Google Play Store), essendo un'applicazione destinata ad uso interno all'azienda, realizzando questo servizio ho potuto tenere traccia delle versioni rilasciate e delle novità e modifiche apportate su ciascuna; in questo modo gli agenti possono verificare se dispongono dell'ultima versione sul proprio dispositivo. Ritorna solamente risposte in formato JSON, e l'interazione con il servizio è possibile solamente mediante richieste POST/PUT/GET/DELETE: il servizio, non appena elabora la richiesta, risponde con un body formattato in JSON, che verrà interpretato dal'applicazione, la quale visualizzerà i dati in caso di successo.
+Questo servizio è di natura temporanea (infatti è stato caricato su un sito di hosting gratuito) e verrà integrato successivamente nell'API REST di Federico, implementando nel portale una sezione dedicata allo sviluppatore.
+
+## Il servizio REST aziendale
 
 Per **REST** (**RE**presentation **S**tate **T**ransfer) si intende un tipo di architettura software per i sistemi distribuiti. Non deve esesre scambiato per un protocollo (quindi come una procedura standardizzata), ma indica in generale un sistema di trasmissione dei dati su protocollo HTTP, e dato che si appoggia su protocollo HTTP, essendo state-less, privo di memoria, non si possono implementare meccanismi come quello della _sessione_; inoltre, la risorse o l'insieme di risorse viene identificata dall'**URI** e dal tipo di richiesta effettuata (il verbo HTTP, come GET, POST, PUT, PATCH, DELETE).
 
@@ -28,6 +39,8 @@ Questo significa che un URI **può** essere un URL, solo se include anche il mec
 * ```http://www.esempio.com/``` è sia un URI che un URL
 * ```tel:+39xxxxxxxxxx``` è un URI ma non un URL, perché ```tel``` non rappresenta alcun protocollo
 
+### L'auteticazione
+
 Non essendoci la possibilità di usare le sessioni data la tipologia del servizio, Federico ha dovuto implementare un meccanismo di accesso seguendo una versione semplificata dello standard di autenticazione OAuth 2.0, in modo tale che gli agenti non dovessero rifare l'accesso più volte.
 
 Procedura di autenticazione:
@@ -40,9 +53,11 @@ Il token, secondo OAuth 2.0, dovrebbe essere rigenerato ad ogni richiesta effetu
 
 **N.B.** si possono generare **più** access code ma un access code può essere usato **una sola volta**, questo perché un acess code viene associato a solo un token (che può essere eventualmente rinnovato, usando lo stesso codice di accesso).
 
-## Lo scambio dei dati
+Il token, combinato con il codice agente (ed in certi casi con la chiave pubblica)
 
-Come ho descritto precendentemente, parte dei dati aziendali (quelli visualizzabili nel portale e nell'applicazione) sono situati all'interno di una base di dati, gestita dal DBMS _Oracle MySQL_, il quale mette a disposizione un server e un client a riga di comando. Viene supportato da molti linguaggi di programmazione, tra cui Java e PHP.
+### I dati
+
+Come ho descritto precendentemente, parte dei dati aziendali (visualizzabili sul portale e sull'applicazione) sono situati all'interno di una base di dati, gestita dal DBMS _Oracle MySQL_, il quale mette a disposizione un server e un client a riga di comando; viene supportato da molti linguaggi di programmazione, tra cui Java e PHP.
 MySQL è un sistema software di gestione di basi di dati (in particolare, MySQL è un ***R**elational* **D**ata **B**ase **M**anagement **S**ystem) in grado di gestire collezioni di dati che siano:
 
 * **Grandi**, perché possono avere dimensioni enormi, solitamente maggiori rispetto alla memoria centrale disponibile: dunque i DBMS devono predisporre di un meccanismo di gestione dei dati in memoria di massa (mediante il *gestore della memoria secondaria*)
@@ -56,6 +71,8 @@ Inoltre, il DBMS deve garantire:
 * **Affidabilità**, ovvero la capacità del sistema di conservare instatto il contenuto della base di dati o di permetterne la ricostruzione in caso di malfunzionamenti hardware o software; inoltre, i DBMS devono gestire le funzioni di ripristino e salvataggio
 * **Privatezza dei dati**, dove gli utenti dovranno essere opportunamente riconosciuti per andare ad eseguire azioni o interrogazioni sulla collezione di dati, attraverso meccanismi di autorizzazione; mediante il **D**ata **C**ontrol **L**anguage l'amministratore del DBMS è in grado di aggiungere o rimuovere utenti, revocare o fornire permessi ad utenti già esistenti, in modo tale che essi possano essee in grado di usare i comandi del **D**ata **D**efinition **L**anguage (il quale permette di agire sullo schema della base di dati) e del **D**data **M**anipulation **L**anguage (la _manipolazione_ dei dati, consente dunque di leggere, scrivere, eliminare, inserire o modificare i dati all'interno delle singole tabelle; il linguaggio più usato attualmente è il linguaggio **SQL**).
 
+Il modello dei dati che segue MySQL è il modello relazionale, attualmente il più diffuso, il quale permette di definire tipi per mezzo del costruttore _relazione_, che consente di organizzare i dati in insiemi di _record_ a struttura fissa. La relazione viene rappresentata per mezzo di una _tabella_, le cui righe rappresentano i specifici record e le cui colonne rappresentano i campi dei record; l'ordine delle righe e delle colonne è sostanzialmente irrilevante. Esistono tanti altri modelli, oltre a quello relazionale, tra cui il modello geraarchico, il modello XML, il modello a oggetti, modelli flessibili e semistrutturati (i NoSQL, cercano di superare le limitazioni dei modelli relazionali) e così via.
+
 Il servizio REST è connesso al database, e risponde alle richieste effettuate dai client basandosi sui dati che ha a disposizione (codice di risposta: 2xx). Se la richiesta non esaudisce i requisiti, viene comunque inviata una risposta con il messaggio di errore (errore lato client, codice 4xx).
 
 L'API è stata rivisitata diverse volte dalla versione originale, ma sin dall'inizio entrambi abbiamo convenuto nell'usare come formato **JSON** (**J**ava**S**cript **O**bject **N**otation) per lo scambio dei dati, essendo facile da leggere, scrivere ed analizzare sia per le persone fisiche che per le macchine.
@@ -65,21 +82,30 @@ Sono per queste caratteristiche e per questa elasticità offerta le motivazioni 
 
 Con la versione odierna del servizio REST quando si va ad eseguire qualsiasi tipo di richiesta la risposta viene scritta nel _body_ della risposta, rispettando il formato JSON, e parte delle richieste contengono dei campi che devono rispettare il formato JSON.
 
-Quando il dispositivo Android va ad eseguire per la prima volta la richiesta delle singole tabelle al server, riceverà per ciascuna tabella una stringa per il controllo dell'integrità dei dati (una _checksum MD5_). Questa checksum verrà usata solo per le richieste successive, se l'agente farà ripartire l'applicazione o se andrà a premere il pulsante _aggiorna_: per non andare a scaricare di nuovo tutte le tabelle, il dispositivo invierà tra i parametri della richiesta anche la checksum prima ricevuta, il servizio andrà a confrontare la sua checksum con quella ricevuta e se risultano identiche risponderà con il codice di stato 304 (Not modified), ciò significa che i dati all'interno al dispositivo sono aggiornati; altrimenti, risponderà con il codice di stato 200 (OK) e nel body saranno presenti tutti i dati con la nuova checksum, il quale andrà sostituita alla vecchia checksum presente nel dispostivo: il telefono dovrà perciò cancellare tutti i dati presenti nella tabella per poi inserire tutti i nuovi dati.
+### Il ruolo della checksum MD5
+
+Quando il client va ad eseguire per la prima volta la richiesta delle singole tabelle al server, riceverà per ciascuna tabella una stringa per il controllo dell'integrità dei dati (una _checksum MD5_). Questa checksum verrà usata a partire dalle richieste successive, quindi se l'agente riavvierà l'applicazione o se andrà a premere il pulsante _aggiorna_: per non andare a scaricare di nuovo tutte le tabelle, il dispositivo, oltre a specificare i parametri nell'URI, andrà a specificare l'header ```If-None-Match```, il quale conterrà la checksum md5; il servizio andrà a confrontare la checksum dei dati che ha a disposizione con quella ricevuta dalla richiesta e se risultano identiche risponderà con il codice di stato 304 (Not modified), ciò significa che i dati all'interno al dispositivo sono aggiornati, quindi non c'è il bisogno di scaricare nulla; altrimenti, risponderà con il codice di stato 200 (OK) e nel body saranno presenti le risorse richieste con la nuova checksum, la quale andrà sostituita alla vecchia checksum presente nel dispostivo: il telefono dovrà perciò cancellare tutti i dati presenti nella tabella per poi sostituirli con i nuovi dati.
 
 Una **funzione hash** è una qualunque funzione che riesce a trasformare i dati in input in un output di lunghezza costante.
 Le **funzioni di hash crittografiche** (H(x)) rappresentano una classe speciale delle funzioni di hash che dispongono di alcune proprietà che le rendono adatte per l'uso della crittografia, tra cui:
 
 * L'**unidirezionalità**, cioè conoscendo l'output (h) deve essere computazionalmente impossibile trovare la stringa di origine
 * L'**effetto valanga**, dove deve cambiare completamente l'output se c'è una piccola modifica sull'input (M)
-* La **resistenza debole alle collisioni**, dove, conoscendo M, deve essere computazionalmente impossibile trovare m' tale che ```H(M)=H(M')```: questo perché è inevitabile la collisione (quindi due messaggi con lo stesso hash), tuttavia, sapendo ```h=H(M)``` e sapendo che esiste un M' tale che ```H(M)=H(M')```, non posso trovare nessuno dei due M avendo h
+* La **resistenza debole alle collisioni**, dove, conoscendo M, deve essere computazionalmente impossibile trovare M' tale che ```H(M)=H(M')```: questo perché è inevitabile la collisione (quindi due messaggi con lo stesso hash), tuttavia, sapendo ```h=H(M)``` e sapendo che esiste un M' tale che ```H(M)=H(M')```, non possa trovare nessuno dei due M avendo h
 * La **resistenza forte alle collisioni**, ovvero deve risultare computazionalmente impossibile trovare una coppia M,M' dove vale l'uguaglianza ```H(M)=H(M')```
 
-L'**MD5** è una funzione crittorgrafica di hash; è una funzione unidirezionale (diversa dalla codifica e dalla cifratura perché irreversibile). Questa funzione prende in pasto una stringa di lunghezza variabile e ne produce un'altra a 128bit (denominata _MD5 checksum_ o _MD5 hash_);
+L'**MD5** è una funzione crittografica di hash; è una funzione unidirezionale (diversa dalla codifica e dalla cifratura perché irreversibile). Questa funzione prende in pasto una stringa di lunghezza variabile e ne produce un'altra a 128bit (32 caratteri, un numero esadecimale),denominata _MD5 checksum_ o _MD5 hash_.
+Si può calcolare la checksum di un file (la sua impronta digitale, o _message-digest_, e se due file presentano la stessa checksum c'è un'alta probabilità che siano identici.
 
-## Gli ambienti di sviluppo
+Nel nostro progetto, la checksum viene usata solo per verificare se i dati sono stati modificati. Il controllo d'integrità dal lato client non è necessario, in quanto il body è formattato nel formato JSON: se una parte del body non è stata elaborata correttamente l'interpretatore JSON(esisitono librerie specializzate per Java come ```org.json``` oppure ```com.google.code.gson```) nella maggior parte dei casi lancia un errore e viene ri-eseguita la richiesta (non capita spesso, salvo zone con minore copertura cellulare, dove la connessione risulta essere più lenta rispetto al solito).
 
-Come ambiente di sviluppo ho scelto **Android Studio**, essendo l'IDE ufficiale per lo sviluppo di applicazioni Android, sviluppato dagli ingegneri Google. Si può dire che questo ambiente di sviluppo è un _fork_ di un altro IDE per Java piuttosto famoso per le sue caratteristiche di eccezione, completamente open-source, denominato IntelliJ IDEA (si parla della versione _Community Edition_, la versione _Ultimate_ è sotto licenza proprietaria), sviluppato dalla software house JetBrains.
+## L'applicazione Android
+
+### Gli strumenti
+
+Avendo avuto esperienze passate, ho deciso di sviluppare un'applicazione **nativa**, usando inizialmente il linguaggio di programmazione _Java_, quindi andando ad usare il **J**ava **D**evelopment **K**it affiancato dall'**Android SDK** (un altro **S**oftware **D**evelopment **K**it, un insieme di strumenti per lo sviluppo e la documentazione software).
+L'Android SDK contiene le librerie e i programmi di sviluppo necessari per la compilazione, per il test e per il debug delle applicazioni.
+Può essere utilizzato qualsiasi IDE affiancato all'SDK, tuttavia, la miglior integrazione la si trova con l'ambiente di sviluppo ufficale, **Android Studio**. Questo ambiente di sviluppo è un _fork_ di un altro IDE per Java piuttosto famoso per le sue caratteristiche di eccezione, completamente open-source, denominato IntelliJ IDEA (si parla della versione _Community Edition_, la versione _Ultimate_ è closed-source sotto licenza proprietaria), sviluppato dalla software house JetBrains.
 Si contraddistingue dagli altri ambienti di sviluppo Java per:
 
 * la sua _keymap_ ricca e completa: infatti, molti sviluppatori riescono ad usare questo programma senza toccare il mouse

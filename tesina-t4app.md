@@ -7,7 +7,9 @@ Abbiamo avuto il compito di progettare un'applicazione Android ed un portale (un
 
 Inanzitutto, ci è stato presentato il problema e abbiamo discusso sulla possibile realizzazione prima di cominciare la seconda fase di alternanza scuola/lavoro.
 
-Io mi sono occupato dell'applicativo Android (grazie alle esperienze passate con questa piattaforma), mentre Federico Bono si è occupato del portale (una Web Application) e della RESTful API (definita così perché rappresenta un insieme di procedure disponibili al programmatore) da cui dipende l'applicazione Android. Inoltre, Federico ha realizzato un piccolo database contente una parte dei dati aziendali, usato sia del portale che dalla RESTful API. Questo perché l'azienda ha al suo interno un gestionale con una sua base di dati, dove parte di essi possono essere esportati su file Excel: questi file excel possono essere usati per importare i dati sulla base di dati creata da Federico mediante il portale.
+Io mi sono occupato dell'applicativo Android (grazie alle esperienze passate con questa piattaforma), mentre Federico Bono si è occupato del portale (una Web Application) e della RESTful API (ho usato il termine API perché rappresenta un insieme di procedure disponibili al programmatore) da cui dipende l'applicazione Android. Inoltre, Federico ha realizzato un piccolo database contente una parte dei dati aziendali, usato sia del portale che dalla RESTful API. Questo perché l'azienda ha al suo interno un gestionale con una sua base di dati, dove parte di essi possono essere esportati su file Excel: questi file excel possono essere usati per importare i dati sulla base di dati creata da Federico mediante il portale.
+
+L'applicazione Android, dopo aver effettuato il login con successo, va a scaricare  e salvare i dati all'interno di un database interno (mediante richieste GET). Le tabelle verranno aggiornate solamente se è stato effettuato qualche cambiamento dal portale o da un altro dispositivo. Dovrà dunque essere in grado di inviare nuovi ordini, visite e clienti effettuando le opportune rcihieste al servizio REST.
 
 ## Il servizio REST
 
@@ -40,8 +42,8 @@ Il token, secondo OAuth 2.0, dovrebbe essere rigenerato ad ogni richiesta effetu
 
 ## Lo scambio dei dati
 
-I dati aziendali sono situati all'interno di una base di dati, gestita dal DBMS Oracle MySQL, il quale mette a disposizione un server e un client a riga di comando. Viene supportato da molti linguaggi di programmazione, tra cui Java e PHP.
-MySQL è un sistema software di gestione di basi di dati (in particolare, MySQL è un *Relational* Data Base Management System) in grado di gestire collezioni di dati che siano:
+Come ho descritto precendentemente, parte dei dati aziendali (quelli visualizzabili nel portale e nell'applicazione) sono situati all'interno di una base di dati, gestita dal DBMS _Oracle MySQL_, il quale mette a disposizione un server e un client a riga di comando. Viene supportato da molti linguaggi di programmazione, tra cui Java e PHP.
+MySQL è un sistema software di gestione di basi di dati (in particolare, MySQL è un ***R**elational* **D**ata **B**ase **M**anagement **S**ystem) in grado di gestire collezioni di dati che siano:
 
 * **Grandi**, perché possono avere dimensioni enormi, solitamente maggiori rispetto alla memoria centrale disponibile: dunque i DBMS devono predisporre di un meccanismo di gestione dei dati in memoria di massa (mediante il *gestore della memoria secondaria*)
 * **Persistenti**, dato che hanno un tempo di vita che non è limitato alle singole istanze delle applicazioni che le utilizzano (infatti, i dati gestiti in memoria centrale hanno una vita che inizia e finisce con l'esecuzione del programma, quindi dati non persistenti)
@@ -54,14 +56,26 @@ Inoltre, il DBMS deve garantire:
 * **Affidabilità**, ovvero la capacità del sistema di conservare instatto il contenuto della base di dati o di permetterne la ricostruzione in caso di malfunzionamenti hardware o software; inoltre, i DBMS devono gestire le funzioni di ripristino e salvataggio
 * **Privatezza dei dati**, dove gli utenti dovranno essere opportunamente riconosciuti per andare ad eseguire azioni o interrogazioni sulla collezione di dati, attraverso meccanismi di autorizzazione; mediante il **D**ata **C**ontrol **L**anguage l'amministratore del DBMS è in grado di aggiungere o rimuovere utenti, revocare o fornire permessi ad utenti già esistenti, in modo tale che essi possano essee in grado di usare i comandi del **D**ata **D**efinition **L**anguage (il quale permette di agire sullo schema della base di dati) e del **D**data **M**anipulation **L**anguage (la _manipolazione_ dei dati, consente dunque di leggere, scrivere, eliminare, inserire o modificare i dati all'interno delle singole tabelle; il linguaggio più usato attualmente è il linguaggio **SQL**).
 
-Il servizio REST è connesso al database, e risponde alle richieste effettuate dai client basandosi sui dati che ha a disposizione.
+Il servizio REST è connesso al database, e risponde alle richieste effettuate dai client basandosi sui dati che ha a disposizione (codice di risposta: 2xx). Se la richiesta non esaudisce i requisiti, viene comunque inviata una risposta con il messaggio di errore (errore lato client, codice 4xx).
 
 L'API è stata rivisitata diverse volte dalla versione originale, ma sin dall'inizio entrambi abbiamo convenuto nell'usare come formato **JSON** (**J**ava**S**cript **O**bject **N**otation) per lo scambio dei dati, essendo facile da leggere, scrivere ed analizzare sia per le persone fisiche che per le macchine.
 Può essere considerato un JSONObject come un insieme di coppie nome/valore, infatti, in diversi linguaggi, ciò si rappresenta mediante un oggetto, un elenco di chiavi, una struct o un'array associativo; il JSONObject inizia e termina con una parentesi graffa, e le coppie sono separate da una virgola. Il valore può essere una stringa, un double, un intero, un booleano, un JSONObject o adirittura un JSONArray, mentre il nome deve essere una stringa.
 Un JSONArray invece inzia e termina con una parentesi quadra, e deve contenere elementi dello stesso tipo: quindi deve contenere solo interi, solo booleani o anche JSONObject aventi in comune la stessa struttura (o addirittura solo JSONArray della stessa struttura); il singolo valore qui viene identificato dalla posizione assunta, quindi è effettivamente un semplice array.
 Sono per queste caratteristiche e per questa elasticità offerta le motivazioni per cui abbiamo scelto di adottare questo formato universale. Consente dunque l'**interoperabilità**, essendo una lingua franca, comune, per i programmi scritti in linguaggi di programmazione differenti.
 
-Con la versione odierna del servizio REST quando si va ad eseguire qualsiasi tipo di richiesta la risposta viene scritta nel _body_ della risposta, rispettando il formato JSON, e parte delle richieste conengono dei campi che devono rispettare il formato
+Con la versione odierna del servizio REST quando si va ad eseguire qualsiasi tipo di richiesta la risposta viene scritta nel _body_ della risposta, rispettando il formato JSON, e parte delle richieste contengono dei campi che devono rispettare il formato JSON.
+
+Quando il dispositivo Android va ad eseguire per la prima volta la richiesta delle singole tabelle al server, riceverà per ciascuna tabella una stringa per il controllo dell'integrità dei dati (una _checksum MD5_). Questa checksum verrà usata solo per le richieste successive, se l'agente farà ripartire l'applicazione o se andrà a premere il pulsante _aggiorna_: per non andare a scaricare di nuovo tutte le tabelle, il dispositivo invierà tra i parametri della richiesta anche la checksum prima ricevuta, il servizio andrà a confrontare la sua checksum con quella ricevuta e se risultano identiche risponderà con il codice di stato 304 (Not modified), ciò significa che i dati all'interno al dispositivo sono aggiornati; altrimenti, risponderà con il codice di stato 200 (OK) e nel body saranno presenti tutti i dati con la nuova checksum, il quale andrà sostituita alla vecchia checksum presente nel dispostivo: il telefono dovrà perciò cancellare tutti i dati presenti nella tabella per poi inserire tutti i nuovi dati.
+
+Una **funzione hash** è una qualunque funzione che riesce a trasformare i dati in input in un output di lunghezza costante.
+Le **funzioni di hash crittografiche** (H(x)) rappresentano una classe speciale delle funzioni di hash che dispongono di alcune proprietà che le rendono adatte per l'uso della crittografia, tra cui:
+
+* L'**unidirezionalità**, cioè conoscendo l'output (h) deve essere computazionalmente impossibile trovare la stringa di origine
+* L'**effetto valanga**, dove deve cambiare completamente l'output se c'è una piccola modifica sull'input (M)
+* La **resistenza debole alle collisioni**, dove, conoscendo M, deve essere computazionalmente impossibile trovare m' tale che ```H(M)=H(M')```: questo perché è inevitabile la collisione (quindi due messaggi con lo stesso hash), tuttavia, sapendo ```h=H(M)``` e sapendo che esiste un M' tale che ```H(M)=H(M')```, non posso trovare nessuno dei due M avendo h
+* La **resistenza forte alle collisioni**, ovvero deve risultare computazionalmente impossibile trovare una coppia M,M' dove vale l'uguaglianza ```H(M)=H(M')```
+
+L'**MD5** è una funzione crittorgrafica di hash; è una funzione unidirezionale (diversa dalla codifica e dalla cifratura perché irreversibile). Questa funzione prende in pasto una stringa di lunghezza variabile e ne produce un'altra a 128bit (denominata _MD5 checksum_ o _MD5 hash_);
 
 ## Gli ambienti di sviluppo
 

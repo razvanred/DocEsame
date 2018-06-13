@@ -2,7 +2,7 @@
 
 ## Introduzione
 
-Nel giugno del 2017 io ed uno studente della sezione AII appartenente allo stesso anno, Federico Bono, abbiamo iniziato a lavorare presso l'azienda T4Group S.R.L. mediante il programma dell'alternanza della scuola-lavoro.
+Nel giugno del 2017 io ed uno studente della sezione AII dello stesso anno, Federico Bono, abbiamo iniziato a lavorare presso l'azienda T4Group S.R.L. mediante il programma dell'alternanza della scuola-lavoro.
 Abbiamo avuto il compito di progettare un'applicazione Android ed un portale (una Web app) per la gestione degli agenti (i venditori) e dei dati aziendali.
 
 Inanzitutto, ci è stato presentato il problema e abbiamo discusso sulla possibile realizzazione prima di cominciare la seconda fase di alternanza scuola/lavoro.
@@ -109,13 +109,13 @@ All'inizio Android era un progetto sviluppato da Android Inc., una start-up fond
 
 Quando venne annuciato il primo iPhone nel 2007, i rumors riguardo alla produzione di un dispositio simile marchiato Google aumentarono.
 
-Il 5 novembre 2007 si svelò l'Open Handset Alliance dopo alcuni incontri _"clandestini"_, un consorzio di aziende tecnologiche tra cui Google, produttori di dispositivi come HTC, Samsung, ASUS e Motorola, operatori telefonici tra cui le americane  Sprint, T-Mobile e l'italiana Telecom Italia, e produttori di chipset come Qualcomm, e presentò:
+Il 5 novembre 2007 si svelò l'Open Handset Alliance (dopo alcuni incontri _"clandestini"_), un consorzio di aziende tecnologiche tra cui Google, produttori di dispositivi come HTC, Samsung, ASUS e Motorola, operatori telefonici tra cui le americane  Sprint, T-Mobile e l'italiana Telecom Italia, e produttori di chipset come Qualcomm, e presentò:
 
 > La prima prattaforma veramente **aperta** e **completa** per i dispositivi mobili, **_Android_**.
 
 Il primo dispositivo consumer ad essere commercializzato con il neonato sistema operativo fu l'_HTC Dream_, noto anche con il nome di _T-Mobile G1_, a partire dal 2008.
 
-Dal 2008 in poi Google ha continuato a sviluppare il suo sistema operativo: ciascuna _release_ è caratterizzata da:
+Dal 2008 in poi Google ha continuato a sviluppare il suo sistema operativo, e ciascuna _release_ di Android è caratterizzata da:
 
 * un nome in codice, che spesso raggruppa più versioni in caso di revisioni minori (ispirato a nomi di dolci, in ordine alfabetico: Alpha, Beta, Cupcake, Donut, Eclair, Froyo, ..., attualmente Oreo)
 * un numero di versione numerico (siamo arrivati alla versione 8.1.0)
@@ -125,15 +125,21 @@ Rispetto ad altri sistemi operativi, Android permetteva lo sviluppo di applicazi
 
 ### L'architettura a layer
 
-L'architettura di Android è composta dai seguenti layer:
+L'architettura di Android è composta dai seguenti layer, partendo dal livello più basso:
 
 1. Il **kernel Linux**, fornisce i servizi essenziali di gestione della memoria centrale, della sicurezza e dei driver delle singole componenti del dispositivo (i produttori hardware riescono a sviluppare i driver per un kernel ben noto). Ad esempio, per le funzionalità di base come il threading o la gestione della memoria centrale l'ART (Android Runtime) si basa sul kernel Linux.
 2. L'**Hardware Absraction Layout**, fornisce interfacce standard, le quali espongono i servizi dell'hardware sottostante al framework Java al livello sovrastante; consiste dunque in un insieme di moduli di librerie, ciascuno dei quali va ad implementare un'interfaccia specifica per una specifica tipologia di componente hardware, come la fotocamera o il sensore della geolocalizzazione. Quando il framework Java va ad eseguire una chiamata per accedere all'hardware del dispositivo, il sistema carica il modulo della libreria per il componente hardware richiesto.
 3. L'**Android RunTime**, dove ciascuna applicazione gira nel suo processo e con la sua istanza di ART Virtual Machine (nel caso di dispositivi con versione 5.0 o superiori) o di Dalvik Virtual Machine (versioni 4.4.4 o inferiori). Entrambe le tipologie macchine virtuali erano state progettate per avere un minor impatto sulla memoria centrale del dispositivo, eseguendo file DEX (simili ai file class prodotti dal compilatore Java), un formato particolare di bytecode progettato specificamente per Android, tuttavia:
-    * la virtual machine Dalvik permetteva la compilazione _**J**ust-**I**n-**T**ime_ del bytecode, dove la compilazione avveniva solamente se richiesta; perciò, ogni volta che l'utente richiedeva l'avvio di un'applicazione, il sistema si occupava di convertire i file DEX associati in istruzioni native, e solo dopo la conclusione di questo processo l'applicazione partiva. Questo processo ripetitivo si traduceva in uno spreco di tempo di durata della carica della batteria, facendo fare lavoro in più al processore.
-    * la virtual machine ART ora permette la compilazione _**A**head-**O**f-**T**ime_ del bytecode: qui i file dex vengono compilati prima di essere richiesti, durante l'installazione del file APK (Android Package, usato per la distribuzione e l'installazione di applicazioni Android). Ciò significa che i tempi di installazione risultano più lunghi (impercettibile la differenza), tuttavia, si riesce ad ottenere un netto risparmio della batteria e performance generali migliorate. Inoltre, questa nuova virtual machine ha portato ottimizzazioni del garbage collector ed un miglior supporto al debug.
+    * la virtual machine Dalvik permetteva la compilazione _**J**ust-**I**n-**T**ime_ del bytecode, dove la compilazione avveniva solamente se richiesta; perciò, ogni volta che l'utente richiedeva l'avvio di un'applicazione, il sistema si occupava di convertire i file DEX associati in istruzioni native, e solo dopo la conclusione di questo processo l'applicazione partiva. Questo processo ripetitivo si traduceva in uno spreco della durata della batteria, impiegando più volte cicli preziosi del processore.
+    * la virtual machine ART ora permette la compilazione _**A**head-**O**f-**T**ime_ del bytecode: qui i file DEX vengono compilati prima di essere richiesti, durante l'installazione del file APK (Android Package, usato per la distribuzione e l'installazione di applicazioni Android). Ciò significa che i tempi di installazione risultano più lunghi (impercettibile la differenza), tuttavia, si riesce ad ottenere un netto risparmio della batteria e performance generali migliorate. Inoltre, la nuova _virtual machine_ ha portato ottimizzazioni del garbage collector ed un miglior supporto al debug.
 4. Le **librerie in C/C++**. Alcune componenti del sistema come ART o HAL sono state originariamente scritte in codice nativo, e richiedono librerie scritte in C e C++. Alcune di queste librerie possono essere usate in Java grazie a framework integrati e specializzati. Se si sviluppa un'applicazione che richiede parti di codice in C o in C++, è possibile usare l'Android **N**ative **D**evelopment **K**it per accedere a parte di queste librerie native direttamente dal codice nativo.
-5. Il framework **Java API Framework**
+5. Il framework **Java API Framework**, un set di funzionalità del sistema operativo disponibili mediante API scritte in Java. Questo permette di poter scrivere applicazioni in una manierà più modulare possibile, ed includono:
+    * il sistema grafico (View System)
+    * il Resource Manager (la classe statica R che permette di accedere a risorse come stringhe, layout, drawable, ecc.)
+    * l'Activity Manager (comprendente il *lifecycle* dell'applicazione)
+    * un gestore delle notifiche
+    * un Content Provider, il quel permette ad un'applicazione di accedere al contenuto di altre applicazioni (per esempio, l'applicazione WhatsApp può accedere al contenuto della rubrica) o di condividere i propri dati
+6. Le **applicazioni di sistema**; questo perché Android comprende una serie di applicazioni preinstallate come il calendario, un browser, l'applicazione di messaggistica SMS e tante altre. Queste app possono essere usate sia dall'utente che da altre applicazioni di terze parti, includendole come componenti: ad esempio, per inviare un SMS da un'app di terze parti è possibile sfruttare un'applicazione specializzata, di cui se ne occuperà.
 
 ## L'applicazione
 

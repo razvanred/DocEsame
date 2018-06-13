@@ -2,25 +2,25 @@
 
 ## Introduzione
 
-Nel giugno del 2017 io ed un compagno di scuola della sezione AII dello stesso anno, Federico Bono, abbiamo iniziato a lavorare presso l'azienda T4Group S.R.L. mediante il programma dell'alternanza della scuola-lavoro.
+Nel giugno del 2017 io ed uno studente della sezione AII appartenente allo stesso anno, Federico Bono, abbiamo iniziato a lavorare presso l'azienda T4Group S.R.L. mediante il programma dell'alternanza della scuola-lavoro.
 Abbiamo avuto il compito di progettare un'applicazione Android ed un portale (una Web app) per la gestione degli agenti (i venditori) e dei dati aziendali.
 
 Inanzitutto, ci è stato presentato il problema e abbiamo discusso sulla possibile realizzazione prima di cominciare la seconda fase di alternanza scuola/lavoro.
 
 Io mi sono occupato dell'applicativo Android (grazie alle esperienze passate con questa piattaforma), mentre Federico Bono si è occupato del portale (una Web Application) e della RESTful API (ho usato il termine API perché rappresenta un insieme di procedure disponibili al programmatore) da cui dipende l'applicazione Android. Inoltre, Federico ha realizzato un piccolo database contente una parte dei dati aziendali, usato sia del portale che dalla RESTful API. Questo perché l'azienda ha al suo interno un gestionale con una sua base di dati, dove parte di essi possono essere esportati su file Excel: questi file excel possono essere usati per importare i dati sulla base di dati creata da Federico mediante il portale.
 
-L'applicazione Android, dopo aver effettuato il login con successo, va a scaricare  e salvare i dati all'interno di un database interno (mediante richieste GET). Le tabelle verranno aggiornate solamente se è stato effettuato qualche cambiamento dal portale o da un altro dispositivo. Dovrà dunque essere in grado di inviare nuovi ordini, visite e clienti effettuando le opportune rcihieste al servizio REST.
+L'applicazione Android, dopo aver effettuato il login con successo, va a scaricare  e salvare i dati all'interno di un database interno (mediante richieste GET). Le tabelle verranno aggiornate solamente se è stato effettuato qualche cambiamento dal portale o da un altro dispositivo. Dovrà dunque essere in grado di inviare nuovi ordini, visite e clienti effettuando le opportune richieste al servizio REST.
 
-Possiamo dire che io ed il mio compagno ci siamo occupati di costruire _una parte_ del **S**istema **I**nformativo **A**ziendale, il quale è un sistema informatico che fa parte della tecnostruttura dell'azienda. Tra i tradizionali flussi aziendali oggigiorno assume sempre più importanza il flusso dell'informazione, ovvero quel bene intangibile che fa scaturire delle attività gestionali. La gestione delle informazioni è delegata ad un Sistema Informatico, solitamente finalizzato a:
+Possiamo dire che io ed il mio compagno ci siamo occupati di costruire _una parte_ del **S**istema **I**nformativo **A**ziendale, il sistema informatico che fa parte della tecnostruttura dell'azienda. Tra i tradizionali flussi aziendali oggigiorno assume sempre più importanza il flusso dell'informazione, ovvero quel bene intangibile che fa scaturire delle attività gestionali. La gestione delle informazioni è delegata ad un Sistema Informatico, solitamente finalizzato a:
 
 * migliorare i processi produttivi di un'azienda (come un sistema ERP, con cui il nostro lavoro non va direttamente ad interferire)
 * costruire e gestire un patrimonio informativo mediante strumenti come un Web Information System
-* Innovare sia i prodotti che i processi produttivi
+* innovare sia i prodotti che i processi produttivi
 
 Sono considerati parte del SIA anche tutti quei prodotti software di produttività individuale (in questo caso, l'applicazione Android per gli agenti, oppure strumenti da ufficio come la suite di Microsoft Office).
 
-Dato che durante il corso dell'anno sono state rilasciate diverse versioni dell'applicazione, verso marzo 2017 ho costruito una piccola RESTful API (scritta in Node.JS): dato che l'applicazione non si trova in alcun _app marketplace_ (come quello ufficiale, il Google Play Store), essendo un'applicazione destinata ad uso interno all'azienda, realizzando questo servizio ho potuto tenere traccia delle versioni rilasciate e delle novità e modifiche apportate su ciascuna; in questo modo gli agenti possono verificare se dispongono dell'ultima versione sul proprio dispositivo. Ritorna solamente risposte in formato JSON, e l'interazione con il servizio è possibile solamente mediante richieste POST/PUT/GET/DELETE: il servizio, non appena elabora la richiesta, risponde con un body formattato in JSON, che verrà interpretato dal'applicazione, la quale visualizzerà i dati in caso di successo.
-Questo servizio è di natura temporanea (infatti è stato caricato su un sito di hosting gratuito) e verrà integrato successivamente nell'API REST di Federico, implementando nel portale una sezione dedicata allo sviluppatore.
+Durante il corso dell'anno sono state rilasciate diverse versioni dell'applicazione, e verso il mese di marzo del 2018 ho costruito una piccola RESTful API (scritta in Node.JS): dato che l'applicazione non si trova in alcun _app marketplace_ (come quello ufficiale, il Google Play Store), essendo un'applicazione destinata ad uso interno all'azienda, realizzando questo servizio ho potuto tenere traccia delle versioni rilasciate e delle novità e modifiche apportate su ciascuna; in questo modo gli agenti possono verificare se dispongono dell'ultima versione sul proprio dispositivo. Ritorna solamente risposte in formato JSON, e l'interazione con il servizio è possibile solamente mediante richieste POST/PUT/GET/DELETE: il servizio, non appena elabora la richiesta, risponde con un body formattato in JSON, che verrà interpretato dal'applicazione, la quale visualizzerà i dati in caso di successo.
+Questo servizio è di natura temporanea (difatti, è stato caricato su un sito di hosting gratuito) e verrà integrato successivamente nell'API RESTful di Federico, implementando nel portale una sezione dedicata allo sviluppatore.
 
 ## Il servizio REST aziendale
 
@@ -99,15 +99,43 @@ Si può calcolare la checksum di un file (la sua impronta digitale, o _message-d
 
 Nel nostro progetto, la checksum viene usata solo per verificare se i dati sono stati modificati. Il controllo d'integrità dal lato client non è necessario, in quanto il body è formattato nel formato JSON: se una parte del body non è stata elaborata correttamente l'interpretatore JSON(esisitono librerie specializzate per Java come ```org.json``` oppure ```com.google.code.gson```) nella maggior parte dei casi lancia un errore e viene ri-eseguita la richiesta (non capita spesso, salvo zone con minore copertura cellulare, dove la connessione risulta essere più lenta rispetto al solito).
 
-## L'applicazione Android
+## Il sistema operativo Android
 
-## Panoramica su Android
+### Com'è nato
 
-Android è il sistema operativo più diffuso per i dispositivi mobili, sviluppato da Google, basato su kernel Linux; è un sistema **embedded** (integrato) ed è in grado di adattarsi su smartphone, tablet, televisori (Android TV), orologi (Android Wear) ed automobili (Android Auto).
+Android è il sistema operativo più diffuso per i dispositivi mobili, sviluppato da Google, basato su kernel Linux; è un sistema **embedded** (integrato); inoltre, sono state prodotte diverse versioni per alcune categorie di prodotti, come i televisori (Android TV), i  dispositivi _wearable_ come gli smartwatch(Android Wear) e le auto (Android Auto), ciascuna con la propria interfaccia utente.
 
-All'inizio era sviluppato da Android Inc., una start-up fondata da Andy Rubin nel 2003, con l'obiettivo di creare un sistema operativo avanzato per fotocamere; dopodiché, nel luglio 2005, l'azienda venne acquisita da Google.
+All'inizio Android era un progetto sviluppato da Android Inc., una start-up fondata a Palo Alto da Andy Rubin nel 2003, con l'obiettivo di creare un sistema operativo avanzato per fotocamere; decisero successivamente, nel 2004, di renderlo un sistema operativo per dispositivi mobili per entrare in competizione con Microsoft Windows Mobile e Symbian OS. Nel luglio del 2005, l'azienda venne acquisita da Google per 50 milioni di dollari.
 
-Quando venne annuciato il primo iPhone nel 2007, i rumors riguardo alla produzione di un dispositio simle marchiato Google aumentarono.
+Quando venne annuciato il primo iPhone nel 2007, i rumors riguardo alla produzione di un dispositio simile marchiato Google aumentarono.
+
+Il 5 novembre 2007 si svelò l'Open Handset Alliance dopo alcuni incontri _"clandestini"_, un consorzio di aziende tecnologiche tra cui Google, produttori di dispositivi come HTC, Samsung, ASUS e Motorola, operatori telefonici tra cui le americane  Sprint, T-Mobile e l'italiana Telecom Italia, e produttori di chipset come Qualcomm, e presentò:
+
+> La prima prattaforma veramente **aperta** e **completa** per i dispositivi mobili, **_Android_**.
+
+Il primo dispositivo consumer ad essere commercializzato con il neonato sistema operativo fu l'_HTC Dream_, noto anche con il nome di _T-Mobile G1_, a partire dal 2008.
+
+Dal 2008 in poi Google ha continuato a sviluppare il suo sistema operativo: ciascuna _release_ è caratterizzata da:
+
+* un nome in codice, che spesso raggruppa più versioni in caso di revisioni minori (ispirato a nomi di dolci, in ordine alfabetico: Alpha, Beta, Cupcake, Donut, Eclair, Froyo, ..., attualmente Oreo)
+* un numero di versione numerico (siamo arrivati alla versione 8.1.0)
+* un API level, un identificativo numerico che specifica la versione delle API utilizzabili dalle app (oggi, API 27)
+
+Rispetto ad altri sistemi operativi, Android permetteva lo sviluppo di applicazioni Android in maniera più _modulare_ rispetto alla concorrenza: questa sua caratteristica rappresentò uno dei maggiori motivi per cui è riuscito a riscuotere grande successo, specie tra le community di sviluppatori dell'intero globo.
+
+### L'architettura a layer
+
+L'architettura di Android è composta dai seguenti layer:
+
+1. Il **kernel Linux**, fornisce i servizi essenziali di gestione della memoria centrale, della sicurezza e dei driver delle singole componenti del dispositivo (i produttori hardware riescono a sviluppare i driver per un kernel ben noto). Ad esempio, per le funzionalità di base come il threading o la gestione della memoria centrale l'ART (Android Runtime) si basa sul kernel Linux.
+2. L'**Hardware Absraction Layout**, fornisce interfacce standard, le quali espongono i servizi dell'hardware sottostante al framework Java al livello sovrastante; consiste dunque in un insieme di moduli di librerie, ciascuno dei quali va ad implementare un'interfaccia specifica per una specifica tipologia di componente hardware, come la fotocamera o il sensore della geolocalizzazione. Quando il framework Java va ad eseguire una chiamata per accedere all'hardware del dispositivo, il sistema carica il modulo della libreria per il componente hardware richiesto.
+3. L'**Android RunTime**, dove ciascuna applicazione gira nel suo processo e con la sua istanza di ART Virtual Machine (nel caso di dispositivi con versione 5.0 o superiori) o di Dalvik Virtual Machine (versioni 4.4.4 o inferiori). Entrambe le tipologie macchine virtuali erano state progettate per avere un minor impatto sulla memoria centrale del dispositivo, eseguendo file DEX (simili ai file class prodotti dal compilatore Java), un formato particolare di bytecode progettato specificamente per Android, tuttavia:
+    * la virtual machine Dalvik permetteva la compilazione _**J**ust-**I**n-**T**ime_ del bytecode, dove la compilazione avveniva solamente se richiesta; perciò, ogni volta che l'utente richiedeva l'avvio di un'applicazione, il sistema si occupava di convertire i file DEX associati in istruzioni native, e solo dopo la conclusione di questo processo l'applicazione partiva. Questo processo ripetitivo si traduceva in uno spreco di tempo di durata della carica della batteria, facendo fare lavoro in più al processore.
+    * la virtual machine ART ora permette la compilazione _**A**head-**O**f-**T**ime_ del bytecode: qui i file dex vengono compilati prima di essere richiesti, durante l'installazione del file APK (Android Package, usato per la distribuzione e l'installazione di applicazioni Android). Ciò significa che i tempi di installazione risultano più lunghi (impercettibile la differenza), tuttavia, si riesce ad ottenere un netto risparmio della batteria e performance generali migliorate. Inoltre, questa nuova virtual machine ha portato ottimizzazioni del garbage collector ed un miglior supporto al debug.
+4. Le **librerie in C/C++**. Alcune componenti del sistema come ART o HAL sono state originariamente scritte in codice nativo, e richiedono librerie scritte in C e C++. Alcune di queste librerie possono essere usate in Java grazie a framework integrati e specializzati. Se si sviluppa un'applicazione che richiede parti di codice in C o in C++, è possibile usare l'Android **N**ative **D**evelopment **K**it per accedere a parte di queste librerie native direttamente dal codice nativo.
+5. Il framework **Java API Framework**
+
+## L'applicazione
 
 ### Gli strumenti
 

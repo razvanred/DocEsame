@@ -103,13 +103,24 @@ Nel nostro progetto, la checksum viene usata solo per verificare se i dati sono 
 
 ### Gli strumenti
 
-Avendo avuto esperienze passate, ho deciso di sviluppare un'applicazione **nativa**, usando inizialmente il linguaggio di programmazione _Java_, quindi andando ad usare il **J**ava **D**evelopment **K**it affiancato dall'**Android SDK** (un altro **S**oftware **D**evelopment **K**it, un insieme di strumenti per lo sviluppo e la documentazione software).
-L'Android SDK contiene le librerie e i programmi di sviluppo necessari per la compilazione, per il test e per il debug delle applicazioni.
-Può essere utilizzato qualsiasi IDE affiancato all'SDK, tuttavia, la miglior integrazione la si trova con l'ambiente di sviluppo ufficale, **Android Studio**. Questo ambiente di sviluppo è un _fork_ di un altro IDE per Java piuttosto famoso per le sue caratteristiche di eccezione, completamente open-source, denominato IntelliJ IDEA (si parla della versione _Community Edition_, la versione _Ultimate_ è closed-source sotto licenza proprietaria), sviluppato dalla software house JetBrains.
-Si contraddistingue dagli altri ambienti di sviluppo Java per:
+Avendo avuto esperienze passate, ho deciso di sviluppare un'applicazione **nativa**, scegliendo inizialmente come linguaggio di programmazione _Java_, quindi andando ad usare il **J**ava **D**evelopment **K**it affiancato all'**Android SDK** (un altro **S**oftware **D**evelopment **K**it, un insieme di strumenti per lo sviluppo e la documentazione software).
 
-* la sua _keymap_ ricca e completa: infatti, molti sviluppatori riescono ad usare questo programma senza toccare il mouse
-* la sua integrazione con i più famosi strumenti di versioning, tra cui Git
+L'Android SDK contiene le librerie e i programmi di sviluppo necessari per la compilazione, il test e per il debug delle applicazioni.
+Affiancato all'SDK può essere utilizzato qualsiasi tipo di ambiente di sviluppo (volendo, anche un semplice editor di testo); tuttavia, la miglior integrazione la si ha con l'ambiente di sviluppo ufficale, **Android Studio**.
+
+Oltre ad Android Studio, per andare a simulare la risoluzione di piccole e possibili problematiche con Java ho usato IntelliJ IDEA, un IDE diventato famoso negli ultimi anni per le sue caratteristiche d'eccezione, sviluppato dalla software-house JetBrains: infatti, Android Studio non è altro che un _fork_ di IntelliJ IDEA (si parla dell'edizione _Community_, la versione _Ultimate_ è closed-source sotto licenza proprietaria), pesantemente modificato, per renderlo adatto allo sviluppo di applicazioni Android.
+
+Rispetto ad altri ambienti, ho trovato utile IntelliJ IDEA per:
+
+* la sua _keymap_ ricca, comoda e completa: infatti, molti sviluppatori riescono ad utilizzare questo programma senza toccare il mouse
+* la sua integrazione con i più famosi strumenti di versioning, tra cui Git; ad esempio, la possibilità di cambiare in pochi click il branch su cui si lavora (ed eventualmente crearne di nuovi), uno strumento di _comparison_ per vedere le modifiche effettuate da un commit all'altro, e tante altre funzionalità utili
+* la sua interfaccia chiara, pulita ed adattabile in base alla situazione
+* uno degli IDE con supporto immediato alle ultime versioni del JDK
+* il suo completamento _"smart"_ (richiamabile mediante ```Cmd + Shift + Spazio```), che suggerisce le classi/i metodi/le variabili più utilizzati nel progetto, basandosi sempre sul **contesto** (per certi versi, somiglia al completamento automatico di Microsoft, impiegato in Visual Studio e Visual Studio Code, IntelliSense)
+* il suo rilevamento intelligente di codice duplicato o di possibile semplificazione di un'espressione, con tanto di sostituizione automatica
+* il salvataggio automatico, non è più necessario salvare manualmente ogni volta i file (per tornare ad una situazione precedente è sempre possibile mediante la sua sezione dedicata _Local History_)
+* la possibilità di usare altri linguaggi di programmazione oltre a Java, ed arriva con un supporto integrato a molti framework moderni (un esempio è il supporto a Node.JS integrato, quindi c'è anche la possibilità di scrivere anche in JavaScript)
+* il suo supporto inequiparabile a **Kotlin**, il linguaggio di programmazione sviluppato dalla stessa software-house, di cui ne parlerò successivamente
 
 Nel corso dell'anno ho rilasciato diverse versioni di quest'applicazione, tuttavia, si possono distinguere ben 3 revisioni generali del codice dall'originale.
 

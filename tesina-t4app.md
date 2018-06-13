@@ -101,12 +101,20 @@ Nel nostro progetto, la checksum viene usata solo per verificare se i dati sono 
 
 ## L'applicazione Android
 
+## Panoramica su Android
+
+Android è il sistema operativo più diffuso per i dispositivi mobili, sviluppato da Google, basato su kernel Linux; è un sistema **embedded** (integrato) ed è in grado di adattarsi su smartphone, tablet, televisori (Android TV), orologi (Android Wear) ed automobili (Android Auto).
+
+All'inizio era sviluppato da Android Inc., una start-up fondata da Andy Rubin nel 2003, con l'obiettivo di creare un sistema operativo avanzato per fotocamere; dopodiché, nel luglio 2005, l'azienda venne acquisita da Google.
+
+Quando venne annuciato il primo iPhone nel 2007, i rumors riguardo alla produzione di un dispositio simle marchiato Google aumentarono.
+
 ### Gli strumenti
 
-Avendo avuto esperienze passate, ho deciso di sviluppare un'applicazione **nativa**, scegliendo inizialmente come linguaggio di programmazione _Java_, quindi andando ad usare il **J**ava **D**evelopment **K**it affiancato all'**Android SDK** (un altro **S**oftware **D**evelopment **K**it, un insieme di strumenti per lo sviluppo e la documentazione software).
+Avendo avuto esperienze passate, ho deciso di sviluppare un'applicazione Android **nativa**, scegliendo inizialmente come linguaggio di programmazione _Java_, quindi andando ad usare il **J**ava **D**evelopment **K**it affiancato all'**Android SDK** (un altro **S**oftware **D**evelopment **K**it, un insieme di strumenti per lo sviluppo e la documentazione software).
 
-L'Android SDK contiene le librerie e i programmi di sviluppo necessari per la compilazione, il test e per il debug delle applicazioni.
-Affiancato all'SDK può essere utilizzato qualsiasi tipo di ambiente di sviluppo (volendo, anche un semplice editor di testo); tuttavia, la miglior integrazione la si ha con l'ambiente di sviluppo ufficale, **Android Studio**.
+Il kit di sviluppo Android contiene tutte le librerie e i programmi di sviluppo necessari per la compilazione, il test e per il debug delle applicazioni.
+Affiancato all'SDK può essere utilizzato qualsiasi tipo di ambiente di sviluppo (volendo, anche un semplice editor di testo); tuttavia, la miglior integrazione la si ottiene con l'ambiente di sviluppo ufficale, **Android Studio**.
 
 Oltre ad Android Studio, per andare a simulare la risoluzione di piccole e possibili problematiche con Java ho usato IntelliJ IDEA, un IDE diventato famoso negli ultimi anni per le sue caratteristiche d'eccezione, sviluppato dalla software-house JetBrains: infatti, Android Studio non è altro che un _fork_ di IntelliJ IDEA (si parla dell'edizione _Community_, la versione _Ultimate_ è closed-source sotto licenza proprietaria), pesantemente modificato, per renderlo adatto allo sviluppo di applicazioni Android.
 
@@ -121,6 +129,21 @@ Rispetto ad altri ambienti, ho trovato utile IntelliJ IDEA per:
 * il salvataggio automatico, non è più necessario salvare manualmente ogni volta i file (per tornare ad una situazione precedente è sempre possibile mediante la sua sezione dedicata _Local History_)
 * la possibilità di usare altri linguaggi di programmazione oltre a Java, ed arriva con un supporto integrato a molti framework moderni (un esempio è il supporto a Node.JS integrato, quindi c'è anche la possibilità di scrivere anche in JavaScript)
 * il suo supporto inequiparabile a **Kotlin**, il linguaggio di programmazione sviluppato dalla stessa software-house, di cui ne parlerò successivamente
+
+Essendo suo _fork_, Android Studio riprende tutte queste caratteristiche d'eccezione, e ci affianca dei tool particolarmente utili per lo sviluppo di applicazioni native, tra cui:
+
+* l'Android Device File Explorer, un file explorer particolare che permette di eplorare cartelle normalmente non visibili (se non si dispongono dei permissi di root)
+* l'Android Logcat, ovvero la console da cui è possibile vedere tutti i System.out/err effettuati dalle singole applicazioni
+* il gestore delle macchine virtuali, l'**A**ndroid **V**irtual **D**evice Manager, da dove è possibile creare una macchina virtuale personalizzata, da dove è possibile scegliere:
+  * la versione del sistema operativo desisderata
+  * l'architettura desiderata
+    * è possibile emulare un'architettura x86 solamente se si dispongono di questi requisiti:
+      * sistema operativo e processore a 64bit
+      * processore Intel, nel BIOS deve essere abilitata la funzione _Intel Virtualization Technology_
+      * almeno 4GB di ram
+      * è richiesto su macchine con Winows o macOS avere installato il software Intel HAXM, un motore di virtualizzazione assistito dall'hardware che sfrutta la tecnologia Intel VT per migliorare le performance della macchina virtuale (con a bordo un sistema operativo a 32 o 64bit); prima questo software era stato progettato per far parte dell'Android SDK, ma poi si è trasformato in un acceleratore generale per QEMU (il virtualizzatore ed il _machine emulator_ su cui si basa l'AVD)
+
+<!--Prima di Android Studio (venne annunciato alla conferenza Google I/O del 2013) , gli sviluppatori usavano Eclipse per sviluppare applicazioni Android-->
 
 Nel corso dell'anno ho rilasciato diverse versioni di quest'applicazione, tuttavia, si possono distinguere ben 3 revisioni generali del codice dall'originale.
 

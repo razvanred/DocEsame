@@ -111,7 +111,7 @@ Quando venne annuciato il primo iPhone nel 2007, i rumors riguardo alla produzio
 
 Il 5 novembre 2007 si svelò l'Open Handset Alliance (dopo alcuni incontri _"clandestini"_), un consorzio di aziende tecnologiche tra cui Google, produttori di dispositivi come HTC, Samsung, ASUS e Motorola, operatori telefonici tra cui le americane  Sprint, T-Mobile e l'italiana Telecom Italia, e produttori di chipset come Qualcomm, e presentò:
 
-> La prima prattaforma veramente **aperta** e **completa** per i dispositivi mobili, **_Android_**.
+> La prima piattaforma veramente **aperta** e **completa** per i dispositivi mobili, **_Android_**.
 
 Il primo dispositivo consumer ad essere commercializzato con il neonato sistema operativo fu l'_HTC Dream_, noto anche con il nome di _T-Mobile G1_, a partire dal 2008.
 
@@ -133,19 +133,59 @@ L'architettura di Android è composta dai seguenti layer, partendo dal livello p
     * la virtual machine Dalvik permetteva la compilazione _**J**ust-**I**n-**T**ime_ del bytecode, dove la compilazione avveniva solamente se richiesta; perciò, ogni volta che l'utente richiedeva l'avvio di un'applicazione, il sistema si occupava di convertire i file DEX associati in istruzioni native, e solo dopo la conclusione di questo processo l'applicazione partiva. Questo processo ripetitivo si traduceva in uno spreco della durata della batteria, impiegando più volte cicli preziosi del processore.
     * la virtual machine ART ora permette la compilazione _**A**head-**O**f-**T**ime_ del bytecode: qui i file DEX vengono compilati prima di essere richiesti, durante l'installazione del file APK (Android Package, usato per la distribuzione e l'installazione di applicazioni Android). Ciò significa che i tempi di installazione risultano più lunghi (impercettibile la differenza), tuttavia, si riesce ad ottenere un netto risparmio della batteria e performance generali migliorate. Inoltre, la nuova _virtual machine_ ha portato ottimizzazioni del garbage collector ed un miglior supporto al debug.
 4. Le **librerie in C/C++**. Alcune componenti del sistema come ART o HAL sono state originariamente scritte in codice nativo, e richiedono librerie scritte in C e C++. Alcune di queste librerie possono essere usate in Java grazie a framework integrati e specializzati. Se si sviluppa un'applicazione che richiede parti di codice in C o in C++, è possibile usare l'Android **N**ative **D**evelopment **K**it per accedere a parte di queste librerie native direttamente dal codice nativo.
-5. Il framework **Java API Framework**, un set di funzionalità del sistema operativo disponibili mediante API scritte in Java. Questo permette di poter scrivere applicazioni in una manierà più modulare possibile, ed includono:
-    * il sistema grafico (View System)
+5. Il framework **Java API Framework**, un set di funzionalità del sistema operativo disponibili mediante API scritte in Java (parte di queste ora sono scritte in Kotlin). Questo permette di poter scrivere applicazioni in una manierà più modulare possibile, ed includono:
+    * il sistema grafico (_View System_, dove tutte le componenti grafiche sono derivate della classe **View**)
     * il Resource Manager (la classe statica R che permette di accedere a risorse come stringhe, layout, drawable, ecc.)
     * l'Activity Manager (comprendente il *lifecycle* dell'applicazione)
     * un gestore delle notifiche
     * un Content Provider, il quel permette ad un'applicazione di accedere al contenuto di altre applicazioni (per esempio, l'applicazione WhatsApp può accedere al contenuto della rubrica) o di condividere i propri dati
-6. Le **applicazioni di sistema**; questo perché Android comprende una serie di applicazioni preinstallate come il calendario, un browser, l'applicazione di messaggistica SMS e tante altre. Queste app possono essere usate sia dall'utente che da altre applicazioni di terze parti, includendole come componenti: ad esempio, per inviare un SMS da un'app di terze parti è possibile sfruttare un'applicazione specializzata, di cui se ne occuperà.
+6. Le **applicazioni di sistema**; questo perché Android comprende una serie di applicazioni preinstallate come il calendario, un browser, l'applicazione di messaggistica SMS e tante altre. Queste app possono essere usate sia dall'utente che da altre applicazioni di terze parti, includendole come componenti: ad esempio, per inviare un SMS da un'app di terze parti è possibile sfruttare un'applicazione specializzata di cui si occuperà dell'invio.
+
+### Il progetto Android
+
+Un progetto Android, oltre ai file di configurazione di Gradle, è composto da tre sezioni importanti:
+
+1. Le **risorse**; contenute nella cartella ```res```, sono un insieme di particolari file di configurazione o immagini accessibili da codice Java (```R.tipo_risorsa.nome_risorsa```) o da XML (```@tipo_risorsa/nome_risorsa```) e dotate della possibilità di essere selezionate in base al particolare dispositivo che esegue l'applicazione, mediante i _qualificatori_. Ad esempio, possono esistere una moltituide di file ```strings.xml``` (collocati in cartelle differenti per distinguersi), che rappresentano le risorse di tipo ```string```, ma tra tutti questi verrà usato il più opportuno in base alla lingua del dispositivo selezionata: verrà usato il file ```values-it/strings.xml``` invece del file ```values/strings.xml``` se la lingua del dispositivo selezionata è l'italiano. Per poter accedere alle risorse, Gradle va a generare automaticamente una classe statica Java denominata R, contente una serie di interi che vanno ad identificare ciascuno la risorsa in modo univoco.
+2. Il **codice sorgente Java**; contenuto all'interno della cartella ```java```, contiene tutte le classi necessarie per far funzionare le applicazioni (le Activity, i Fragment ecc.) scritte dallo sviluppatore o generate automaticamente dal compilatore (un esempio è la classe R)
+3. Il file **AndroidManifest.xml**; contenuto all'interno della cartella ```manifests``` (si possono creare più versioni di questo file, ciascuna associata ad una _build variant_), le sue funzioni principali sono:
+    * specificare il **package** Java dell'applicazione
+    * descrivere i componenti dell'applicazione
+    * dichiarare i permessi che l'applicazione deve avere per poter funzionare (connessione a internet, fotocamera, microfono ecc.)
+    * dichiarare il minimo livello di Android API che l'app supporta
+    * dichiarare le activity (in particolare, specificare l'activity iniziale)
+
+### Il ruolo dell'Activity
+
+Generalmente, un'applicazione è suddivisa in più schermate, e ciascuna schermata rappresenta (il più delle volte) un'**Activity**, ovvero una classe che estende la classe **Activity** (o **AppCompatActivity**) messa a disposizione dal layer **Java API Framwork**.
+
+Ciascuna activity è caratterizzata da un insieme di metodi che possono essere sovrascritti dalla classe derivata, i quali rappresentano il **Lifecycle** della schermata: sono tutti quei metodi **callback** che vengono richiamati quando la schermata subisce particolari cambiamenti, come la rotazione dello schermo, la chiusura dell'applicazione, la pressione del tasto _indietro_, la ricevuta di una chiamata e così via.
+
+I metodi appartenenti al Lifecycle sono i seguenti:
+
+* quando viene invocata la visualizzazione della schermata, il primo metodo ad essere richiamato è il metodo ```onCreate(savedInstanceState:Bundle)```, dove solitamente le componenti dell'interfaccia grafica vengono istanziate:
+  * per andare a caricare il layout associato alla schermata che si desidera visualizzare, dopo aver richiamato il metodo onCreate sovrastante (mediante il costrutto ```super.nomeMetodo(args)```), bisognerà andare a richiamare il metodo ```setContentView(int risorsa)``` appartenente alla classe padre
+  * mediante il metodo ```findViewById(int risorsa)``` è possibile andare ad ottenere l'istanza del componente grafico, per assegnarla ad un puntatore dichiarato all'interno della classe activity. Questo metodo ritornerà sempre un oggetto di tipo _View_, tuttavia, mediante il _cast_ è possibile ottenere la sua _forma_ originale (il tipo con cui si va ad eseguire la conversione deve essere in qualche modo derivato della classe View, e deve corrispondere al tipo dichiarato all'interno del file XML)
+* dopo aver terminato il metodo ```onCreate``` con successo viene richiamato il metodo ```onStart()```, il quale rende visibile la schermata all'utente, prima di diventare interagibile (metodo molto veloce)
+* dopo la terminazione del metodo ```onStart``` viene richiamato il metodo ```onResume()```, e qui l'utente è in grado di interagire con la schermata. Alla fine di questo metodo, l'activity passa nello stato **RUNNING** (in esecuzione). Può essere richiamato anche dopo il metodo ```onPause```
+* il metodo ```onPause()``` viene richiamato quando parte dell'activity risulta ancora visibile, ma in primo piano vi può essere ad esempio una notifica o una finestra di dialogo. Se dopo questo metodo la schermata viene completamente nascosta, viene richiamato il metodo ```onStop()```, altrimenti viene di nuovo richiamato il metodo ```onResume()```
+* il metodo ```onStop()``` viene richiamato quando la schermata viene nascosta, dopo la terminazione del metodo ```onPause()```. Se l'utente sceglie di tornare alla schermata viene richiamato il metodo ```onRestart()```; se un'altra applicazione in primo piano richiede memoria l'applicazione passerà allo stato **KILLED** (uccisa), e se la schermata in questione verrà di nuovo richiamata si ricomincia dal metodo ```onCreate()```
+* il metodo ```onDestroy()```, dopo la terminazione del metodo ```onStop()```, viene richiamato solamente se l'activity ha invocato il metodo ```finish()``` o se viene invocato dal sistema: l'activity è stata **chiusa**
+
+### Il processo di build di un file APK (non firmato)
+
+Il processo di compilazione per le applicazioni Android risulta completamente diverso rispetto al processo di compilazione delle applicazioni tradizionali Java. Tutta, entrambi i processi hanno una fase iniziale in comune: il codice sorgente Java viene compilato in _bytecode_ (file .class) mediante il comando ```javac```.
+
+I file .class e tutte le librerie JAR vengono poi convertite in bytecode **D**alvik **EX**ecutable (i file DEX sopra citati), mediante il comando ```dx```: quindi tutti i file .class e .jar vengono tutti uniti in un singolo file, ```classes.dex```, scritto nel formato bytecode Dalvik.
+
+Infine, il file generato e le risorse come i layout o le immagini, vengono compresse in un file simile allo zip, denominato _**A**ndroid **P**ac**K**age_, mediante lo strumento _**A**ndroid **A**ssets **P**ackaging **T**ool_, ```aapt```, presente all'interno dell'**Android SDK**.
+
+Il file APK potrà essere utilizzato per distribuire l'applicazione. Per poterla distribuire sul _Google Play Store_, dovrà essere firmato mediante ulteriori passaggi.
 
 ## L'applicazione
 
 ### Gli strumenti
 
-Avendo avuto esperienze passate, ho deciso di sviluppare un'applicazione Android **nativa**, scegliendo inizialmente come linguaggio di programmazione _Java_, quindi andando ad usare il **J**ava **D**evelopment **K**it affiancato all'**Android SDK** (un altro **S**oftware **D**evelopment **K**it, un insieme di strumenti per lo sviluppo e la documentazione software).
+Avendo avuto esperienze passate, ho deciso di sviluppare un'applicazione Android **nativa**, scegliendo inizialmente come linguaggio di programmazione _Java_, quindi andando ad usare il kit di sviluppo **Android SDK** (un **S**oftware **D**evelopment **K**it, un insieme di strumenti per lo sviluppo e la documentazione software).
 
 Il kit di sviluppo Android contiene tutte le librerie e i programmi di sviluppo necessari per la compilazione, il test e per il debug delle applicazioni.
 Affiancato all'SDK può essere utilizzato qualsiasi tipo di ambiente di sviluppo (volendo, anche un semplice editor di testo); tuttavia, la miglior integrazione la si ottiene con l'ambiente di sviluppo ufficale, **Android Studio**.
@@ -177,17 +217,45 @@ Essendo suo _fork_, Android Studio riprende tutte queste caratteristiche d'eccez
       * almeno 4GB di ram
       * è richiesto su macchine con Winows o macOS avere installato il software Intel HAXM, un motore di virtualizzazione assistito dall'hardware che sfrutta la tecnologia Intel VT per migliorare le performance della macchina virtuale (con a bordo un sistema operativo a 32 o 64bit); prima questo software era stato progettato per far parte dell'Android SDK, ma poi si è trasformato in un acceleratore generale per QEMU (il virtualizzatore ed il _machine emulator_ su cui si basa l'AVD)
 
-<!--Prima di Android Studio (venne annunciato alla conferenza Google I/O del 2013) , gli sviluppatori usavano Eclipse per sviluppare applicazioni Android-->
+Prima di Android Studio, gli sviluppatori usavano Eclipse per creare applicazioni Android, il quale sfruttava **Maven** come gestore delle dipendenze (uscito del 2004) e si occupava di eseguire automaticamente le fasi necessarie per la costruzione del file APK. Tuttavia, il tool non risultava abbastanza flessibile con l'evoluzione della programmazione Android, tanto da diventare ad un certo punto difficile e scomodo da usare.
 
-Nel corso dell'anno ho rilasciato diverse versioni di quest'applicazione, tuttavia, si possono distinguere ben 3 revisioni generali del codice dall'originale.
+Alla conferenza annuale _Google I/O_ del 2013, oltre ad essere stato annunciato Android Studio, venne presentato anche **Gradle** (la dua prima versione uscì nel 2007, ottenne popolarità grazie al mondo Android), che non è altro che un altro sistema di build e gestore di dipendenze, più flessibile rispetto al rimpiazzato Maven: è un sistema di build basato sulla JVM, ciò significa che è possibile scrivere il proprio script in Java che poi potrà essere eseguito.
 
-Nel codice sorgente della prima versione per la comunicazione con il server e per lo scaricamento dei dati ho usato molte classi e metodologie di approccio ai problemi appartenenti al mondo Java.
+### L'evoluzione nel tempo
 
-Per effettuare il collegamento al server ho impeigato l'utilizzo di:
+Nel corso dell'anno ho rilasciato diverse versioni di quest'applicazione, tuttavia, si possono distinguere ben 3 revisioni generali del codice originale.
 
-* un oggetto HttpsURLConnection (classe astratta situata nel package _javax.net.ssl_) che rappresenta la connessione con il server
-* un oggetto BufferedStreamReader per leggere il contenuto dell'oggetto InputStream (classe astratta che rappresenta un input stream di bytes, quindi in questo caso contenente la risposta del server alla richiesta sotto forma di bytes) ritornato dall'istanza di HttpsURLConnection, prende in pasto l'inputstream
-* il BufferedInputStream legge solitamente _bytes_, i quali mediante un _charset_ possono essere convertiti in caratteri. Quindi ho impiegato l'utilizzo di un _Reader_ (BufferedReader)
+Inizialmente, come linguaggio di programmazione, ho scelto **Java**, essendo un linguaggio fortemente tipizzato ed orientato agli oggetti (_**O**bject **O**riented **P**rogramming_), dove vengono raggruppate in un'unica entità (la **classe**) sia le strutture dati che le procedure che operano su di esse; l'istanza della classe prende il nome di **oggetto**, dotata di proprietà (i dati) e metodi che operano sui dati dell'oggetto stesso.
+Il meccanismo più potente ed utile di questo linguaggio per raggiungere i miei obiettivi è stato quello dell'ereditarietà, che mi permette di derivare nuove classi a partire da classi già definite, con la possibilità di aggiungere nuove proprietà e nuovi metodi nella classe derivata, ed eventualmente modificare il comportamento di alcuni metodi definiti nella classe sovrastante laddove è possibile.
 
-Inizialmente, come linguaggio di programmazione ho scelto Java, essendo un linguaggio fortemente tipizzato ed orientato agli oggetti (OOP, ovvero Object Oriented Programming), dove vengono ragruppate in un'unica entità (la classe) sia le strutture dati che le procedure che operano su di esse; l'istanza della classe prende il nome di oggetto, dotato di proprietà (i dati) e metodi che operano sui dati dell'oggetto stesso.
-Il meccanismo più potente ed utile di questo linguaggio per raggiungere i miei obiettivi è quello dell'ereditarietà, che mi permette di derivare nuove classi a partire da classi già definite, con la possibilità di aggiungere nuove proprietà e nuovi metodi nella classe derivata, ed eventualmente modificare il comportamento di alcuni metodi definiti nella classe sovrastante laddove è possibile
+#### Prima versione
+
+Nel codice sorgente della prima versione per la comunicazione con il server e per lo scaricamento dei dati ho usato molte classi e metodologie di approccio ai problemi appartenenti al mondo Java,.
+
+Un esempio è la procedura di collegamento al server, ho impeigato l'utilizzo di:
+
+* un oggetto _HttpsURLConnection_ (classe astratta situata nel package _javax.net.ssl_) che rappresenta la connessione con il server
+* un oggetto _BufferedStreamReader_ per leggere il contenuto dell'oggetto InputStream (classe astratta che rappresenta un input stream di bytes, quindi in questo caso contenente la risposta del server alla richiesta sotto forma di bytes) ritornato dall'istanza di HttpsURLConnection, prende in pasto l'inputstream
+* il _BufferedInputStream_ legge solitamente _bytes_, i quali mediante un _charset_ possono essere convertiti in caratteri. Quindi per poterlo leggere (dopo averlo opportunamente istanziato mediante l'InputStream ricevuto) ho impiegato l'utilizzo di un _Reader_, altrimenti sarei rimasto costretto ad interpretare char-per-char mediante il metodo ```read()``` (operazione lentissima e dispendiosa)
+* un oggetto _BufferedReader_, che richiedeva un _InputStreamReader_, e quest'ultimo prendeva in pasto il BufferedInputStream istanziato precedentemente e il charset su cui doveva basarsi per effettuare la conversione (tutti i charset supportati sono definiti all'interno della classe statica _StandardCharsets_)
+  * quest'oggetto offre la possibilità di leggere un'intera riga, e quando si raggiunge la fine dell'InputStream ritorna ```null```
+  * mediante l'istanza _StringBuilder_ sono ad aggiungere ogni volta la riga letta (se diversa da ```null```). Le principali motivazioni per cui sono andato ad usare questa classe sono le seguenti:
+    * la classe convenzionale **String** non consente l'aggiunta in coda (l'_appending_): ogni volta che si va ad effettuare un'operazione simile a questa ```str += aggStr``` viene creato un nuovo oggetto e il puntatore viene riassegnato, impiegando dunque l'uso del _Garbage Collector_ per andare ad eliminare il vecchio oggetto. Per questo motivo String viene definito come _immutabile_, non riesce a cambiare il suo stato interno
+    * ed è qui che assume importanza l'oggetto **StringBuilder**, essendo mutabile: mediante i suoi metodi come ```builder.append(nuovaStr)``` va ad alterare il suo array di char interno, invece di andare a creare un nuovo oggetto
+
+Tutte le tabelle richieste e lette andavano a salvarsi su file JSON presenti all'interno del dispositivo; ciò nonostante, vi erano alcuni svantaggi riguardo alla proceduta:
+
+* i tempi di elaborazione (dopo lo scaricamento) erano troppo lunghi, facendo sprecare tempo prezioso all'agente ad ogni avvio dell'applicazione
+* tutta la procedura era circondata (_surrounded_) da una complicatissima **gestione delle eccezioni**, che cercava di risolvere particolari imprevisti come:
+  * l'interruzione dell'applicazione durante lo scaricamento
+  * l'interruzione dell'applicazione durante l'elaborazione
+  * a volte il processo di elaborazione o di scaricamento falliva, quindi bisognava andare anche a gestire quei determinati casi
+  * mancanza di collegamento ad Internet da parte dell'agente, quindi andare a verificare se vi erano già presenti i file scaricati all'interno del dispositivo (questo perché l'applicazione deve continuare a funzionare anche in assenza di connessione) oppure se ritornare un messaggio di errore che bloccava completamente l'accesso all'applicazione
+  * tante altre casistiche...
+* tutta la procedura veniva eseguita all'interno di un thread separato rispetto al thread dell'UI, quindi sono andato a sfruttare il meccanismo dei **semafori** (come facevo in passato su applicazioni desktop tradizionali Java) per bloccare qualsiasi tocco da parte dell'utente; tuttavia:
+  * dato che andavano a bloccare il thread dell'UI, non potevo far visualizzare alcuna animazione grafica di caricamento
+  * l'intero sistema Android non si trovava particolarmente a suo agio con l'uso dei semafori, e spesso l'uso dei semafori si faceva risentire anche in applicazioni di terze parti, nel launcher di sistema o nel gestore delle notifiche
+
+#### Seconda versione
+
+Nella seconda versione invece, iniziata nel settembre del 2017, dopo essermi documentato adeguatamente sul sito ufficiale [Android Developers](https://developer.android.com/) durante l'estate (al di fuori del lavoro), ho scoperto la possibilità di creare database interni all'applicazione: infatti, lo strato **Java API Framework** mette a disposizione dello sviluppatore

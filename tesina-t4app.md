@@ -356,6 +356,61 @@ L'azienda mi ha chiesto di implementare la possibilità di avere più account ag
 
 Verso marzo ho scoperto l'esistenza di un nuovo set di librerie, _Android Architecture Components_, presentato alla conferenza Google I/O del 2017: queste librerie permettono di sviluppare applicazioni **robuste**, **testabili** (mediante librerie come _JUnit_) e **manutenibili**.
 
+##### La libreria Room
+
+Una di queste librerie prende il nome di **_Room_**, la quale fornisce **un livello di astrazione** su SQLite per consentire un accesso più comodo al database:
+
+* ciascuna entità viene rappresentata da una classe, annotata con l'annotazione ```@Entity```
+  * ciascun parametro rappresenta una colonna all'interno della tabella
+  * mediante l'annotazione ```@PrimaryKey``` è possibile andare a definire la primary key dell'entità
+  * mediante l'annotazione ```@ForeignKey``` è possibile andare a definire le foreign keys
+  * mediante l'annotazione ```@Index``` è possibile andare a definire gli indici secondari
+  * tutti i parametri devono essere ```public```, oppure possono essere ```private``` con gli opportuni getters e setters che rispettino le convenzioni _JavaBeans_ (```getNome()``` e ```setNome(nome:String)``` per il parametro ```nome```)
+  * parametri che devono essere ignorati (non inclusi nella tabella) devono essere annotati con ```@Ignore```
+  * parametri con un tipo non primitivo o diverso da String devono essere convertiti mediante classi specializzate che possono essere definite dal programmatore, annotate con ```@TypeConverter```
+* le relazioni (1 a 1, 1 a N, N a N) tra le entità vengono rappresentate da classi separate (mediante le opportune annotazioni, ```@Embedded``` e ```@Relation```) conenente gli oggetti delle entità
+* ciascuna entità (o ciascuna relazione) può avere un suo set di query: devono essere definite all'interno di un'interfaccia annotata con ```@Dao``` contenente metodi astratti annotati con ```@Query("SELECT/INSERT/DELETE")```, ```@Insert```, ```@Delete```o ```@Update```
+* la classe che rappresenta il database:
+  * deve essere astratta
+  * deve estendere la classe astratta ```RoomDatabase``` fornita dal framework
+  * annotata con ```@Database``` contenente:
+    * devono essere dichiarate tutte le classi delle entità
+    * la versione del database
+  * devono essere dichiarate tutte le classi TypeConverter all'interno dell'annotazione ```@TypeConverters```
+  * deve contenere metodi astratti che ritornano le istanze Dao generate dal compilatore mediante le interfaccie annotate con ```@Dao```
+
+In Java (così come in Kotlin), le **annotazioni** sono una forma di metadati: forniscono informazioni su un programma che non fa parte del programma stesso. Le annotazioni non hanno alcun effetto diretto sul funzionamento del codice annotato.
+In questo caso le annotazioni sono utili al compilatore: mediante le annotazioni è in grado di generare codice Java dalle classi, dagli attributi e dai metodi annotati opportunamente, che verrà poi convertito in bytecode per il device.
+
 ##### Le basi di dati
 
-Una di queste librerie prende il nome di **_Room_**, la quale fornisce **un livello di astrazione** su SQLite per consentire un accesso più comodo al database. mediante gli oggetti.
+<!--immagine con la prima base di dati-->
+
+Ciascun agente che esegue il login con successo viene registrato nel database interno dedicato agli accessi, _Agenti.db_, contenente la sola tabella _Agenti_: qui sono incluse tutte le informazioni dell'agente, ottenute in fase di login, ed il token con cui è possibile effettuare le richieste (con tanto di data di scadenza). La primary key è il codice dell'agente, quindi non è possibile fare il login più volte con lo stesso codice agente.
+
+Per ciascun agente viene creato un database, _x.db_ (x è il codice dell'agente, essendo univoco all'interno della tabella _Agenti_).
+Vi sono alcuni campi particolari, come _listini_ all'interno di _Ordine_, contenente fisicamente una striga, ma attraverso un TypeConverter definito viene convertito in ```Array<ProdottiListino>``` in runtime, mediante la libreria **Gson** (libreria che permette di convertire oggetti Java nella loro rappresentazione in JSON, e viceversa, mediante i metodi ```fun toJson(oggetto:Tipo):String``` e ```fun<Tipo> fromJson(json:String, classeTipo:Class<*>):Tipo```.
+
+Come ho descritto nel paragrafo _I dati_, per aggiornare una singola tabella viene cancellato l'intero contenuto della tabella e vengono inserite le nuove tuple.
+
+Prendiamo come esempio la relazione tra la tabella Visite e la tabella Clienti: quando cancello l'intero contenuto di Clienti viene lanciata un'eccezione, dato che Visite contiene riferimenti alle tuple di Clienti (oppure vengono perse tutte le visite se la politica di reazione è _ON DELETE CASCADE_). Per evitare il problema, ho sostituito la foreign key della Visita con un **indice secondario**: tutto il contenuto della tabella Clienti viene cancellato, senza andare ad instaccare la tabella Visite, e successivamente, una volta che il processo di aggiornamento è stato completato, mediante una query vado a cancellare tutte le tuple che contengono riferimenti a codici cliente non più esistenti.
+
+```sql
+DELETE FROM Visite
+WHERE codiceCliente NOT IN (SELECT c.codiceCliente
+FROM Clienti c);
+```
+
+Sia la tabella Scaduti che la tabella Ordini contengono riferimenti a Clienti: anche qui le _foreign key_ sono state rimpiazzate con gli indici; tuttavia, la query che va a cancellare le tuple che non contengono riferimenti a clienti non è necessaria, in quanto sono tabelle scaricate dalla RESTful API: se il contenuto delle tabelle Scaduti e Ordini cambia (come l'eliminazione di un cliente, che porterebbe ad una cancellazione di tutti gli ordini e gli scaduti relativi), cambia anche l'hash MD5 delle due tabelle, e di conseguenza il dispositivo si trova costretto ad aggiornarle.
+
+Gli indici rappresentano una struttura ridondante.
+
+##### Comunicazione con il server
+
+Per implementare la comunicazione con il server ho usato una libreria di terze parti, **Retrofit** (mantenuta dall'azienda Square), che mi permette di definire un'interfaccia, contenente metodi astratti annotati con le opportune annotazioni (per specificare se la richiesta è GET/POST/DELETE/..., la **path** della richiesta, manipolazione dell'URL o degli headers ed altro), e chiascun metodo rappresenta una determinata chiamata al server mediante il protocollo HTTP. La chiamata può essere gestita in modo _sincrono_ o _asincrono_.
+
+Anche qui, essendoci le annotazioni, il compilatore genererà il codice necessario per il suo funzionamento.
+
+Dato che il funzionamento di questa libreria si basa sulla libreria _OkHttp_, il body può essere deserializzato solo nel tipo ```ResponseBody``` senza un _converter_ definito.
+
+Il **converter** (in questo progetto ho impiegato l'uso del _converter Gson_) ha il compito di convertire il body nel tipo specificato (mediante l'uso dei _Generics_), quindi con la possibilità di esprimere espressioni come ```fun getAll(parametri):Call<Tipo>``` all'interno dell'interfaccia.

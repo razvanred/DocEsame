@@ -326,7 +326,7 @@ Per andare ad eliminare codice _boilerplate_ dedicato all'interpretazione del JS
 * doveva essere qualcosa di standardizzato, e invece, si rivelò utile solamente ai casi di cui avevo bisogno inizialmente (non avevo previsto ad esempio interrogazioni che richiedevano JOIN o selezioni particolari)
 * il processo di creazione e di esecuzione della query non era tanto veloce quanto la scrittura della query manuale
 
-La libreria si basava molto sull'utilizzo delle **interfacce** Java/Kotlin (su Kotlin è possibile andare a dichiarare metodi già definiti al loro interno ed attributi astratti): sono simili alle classi, ma contengono solo dichiarazioni di metodi.
+Con questa libreria, ho cercato dunque di fornire un livello di astrazione sulla formazione delle query. Si basava molto sull'utilizzo delle **interfacce** Java/Kotlin (su Kotlin è possibile andare a dichiarare metodi già definiti al loro interno ed attributi astratti): sono simili alle classi, ma contengono solo dichiarazioni di metodi.
 
 Devo ammettere che inizialmente non riuscivo a dare una giustificazione alla loro esistenza, eppure, si sono rilevate davvero utili nel campo: **la dichiarazione di un metodo garantisce che sarà presente in tutte le sottoclassi**.
 
@@ -344,4 +344,18 @@ La libreria era composta da:
 * alcune tuple delle tabelle erano inviabili, perciò i figli rappresentanti implementavano l'interfaccia _Uploadable_
 * vi erano anche figli che implementavano entrambe le ultime due interfacce citate (ad esempio, è possibile scaricare la lista dei clienti così com'è possibile inviare un nuovo cliente)
 
-Tutto ciò mi ha permesso di creare un _for_ che scorreva tutti gli ```object``` figli, quindi veniva creata ciascuna tabella se non esisteva (più pulito e leggibile il codice rispetto alla seconda versione), e se implementava la classe _Downloadable_, iniziava anche la procedura di _scaricamento_ e di _salvataggio_.
+Tutto ciò mi ha permesso di creare un _for_ che scorreva tutti gli ```object``` figli all'avvio dell'applicazione, quindi veniva creata ciascuna tabella se non esisteva (più pulito e leggibile il codice rispetto alla seconda versione), e se implementava la classe _Downloadable_, iniziava anche la procedura di _scaricamento_ e di _salvataggio_.
+
+Successivamente, è stata anche implementata la comunicazione con il servizio RESTful dedicato alla verifica dell'ultima versione disponibile, ed in questo modo gli agenti possono sapere se la loro applicazione è aggiornata (non essendo disponibile su alcun _marketplace_ digitale).
+
+Questa versione è stata usata dagli agenti a partire da febbraio, ed ho continuato ad aggiornarla ed a implementare nuove funzionalità.
+
+#### Quarta versione
+
+L'azienda mi ha chiesto di implementare la possibilità di avere più account agente all'interno del dispositivo: avrei potuto cambiare il package dell'applicazione per poter avere tanti clone dell'app sullo stesso dispositivo, ma ho deciso di non farlo, sarebbe stata una ridondanza della stessa applicazione, influendo sulla memoria di massa occupata nel dispositivo.
+
+Verso marzo ho scoperto l'esistenza di un nuovo set di librerie, _Android Architecture Components_, presentato alla conferenza Google I/O del 2017: queste librerie permettono di sviluppare applicazioni **robuste**, **testabili** (mediante librerie come _JUnit_) e **manutenibili**.
+
+##### Le basi di dati
+
+Una di queste librerie prende il nome di **_Room_**, la quale fornisce **un livello di astrazione** su SQLite per consentire un accesso più comodo al database. mediante gli oggetti.

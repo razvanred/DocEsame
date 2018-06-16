@@ -143,12 +143,12 @@ L'architettura di Android è composta dai seguenti layer, partendo dal livello p
 
 ### Il progetto Android
 
-Un progetto Android, oltre ai file di configurazione di Gradle, è composto da tre sezioni importanti:
+Un progetto Android, oltre ai file di configurazione di Gradle, è composto da tre sezioni fondamentali:
 
 1. Le **risorse**; contenute nella cartella ```res```, sono un insieme di particolari file di configurazione o immagini accessibili da codice Java (```R.tipo_risorsa.nome_risorsa```) o da XML (```@tipo_risorsa/nome_risorsa```) e dotate della possibilità di essere selezionate in base al particolare dispositivo che esegue l'applicazione, mediante i _qualificatori_. Ad esempio, possono esistere una moltituide di file ```strings.xml``` (collocati in cartelle differenti per distinguersi), che rappresentano le risorse di tipo ```string```, ma tra tutti questi verrà usato il più opportuno in base alla lingua del dispositivo selezionata: verrà usato il file ```values-it/strings.xml``` invece del file ```values/strings.xml``` se la lingua del dispositivo selezionata è l'italiano. Per poter accedere alle risorse, Gradle va a generare automaticamente una classe statica Java denominata R, contente una serie di interi che vanno ad identificare ciascuno la risorsa in modo univoco.
 2. Il **codice sorgente Java**; contenuto all'interno della cartella ```java```, contiene tutte le classi necessarie per far funzionare le applicazioni (le Activity, i Fragment ecc.) scritte dallo sviluppatore o generate automaticamente dal compilatore (un esempio è la classe R)
 3. Il file **AndroidManifest.xml**; contenuto all'interno della cartella ```manifests``` (si possono creare più versioni di questo file, ciascuna associata ad una _build variant_), le sue funzioni principali sono:
-    * specificare il **package** Java dell'applicazione
+    * specificare il **package** dell'applicazione
     * descrivere i componenti dell'applicazione
     * dichiarare i permessi che l'applicazione deve avere per poter funzionare (connessione a internet, fotocamera, microfono ecc.)
     * dichiarare il minimo livello di Android API che l'app supporta
@@ -171,6 +171,8 @@ I metodi appartenenti al Lifecycle sono i seguenti:
 * il metodo ```onStop()``` viene richiamato quando la schermata viene nascosta, dopo la terminazione del metodo ```onPause()```. Se l'utente sceglie di tornare alla schermata viene richiamato il metodo ```onRestart()```; se un'altra applicazione in primo piano richiede memoria l'applicazione passerà allo stato **KILLED** (uccisa), e se la schermata in questione verrà di nuovo richiamata si ricomincia dal metodo ```onCreate()```
 * il metodo ```onDestroy()```, dopo la terminazione del metodo ```onStop()```, viene richiamato solamente se l'activity ha invocato il metodo ```finish()``` o se viene invocato dal sistema: l'activity è stata **chiusa**
 
+**N.B.** la classe Activity estende una classe astratta di particolare rilievo, denominata _Context_: permette l'accesso alle risorse e a classi specifiche dell'applicazione, il lancio di una nuova Activity mediante il meccanismo degli _Intent_ o la ricezione di un _Intent_ (meccanismo principalmnete usato per far partire una nuova activity, può essere usato anche per trasportare dati o può essere ricevuto come una risposta attesa da parte di un'altra schermata), e molto altro.
+
 ### Il processo di build di un file APK (non firmato)
 
 Il processo di compilazione per le applicazioni Android risulta completamente diverso rispetto al processo di compilazione delle applicazioni tradizionali Java. Tutta, entrambi i processi hanno una fase iniziale in comune: il codice sorgente Java viene compilato in _bytecode_ (file .class) mediante il comando ```javac```.
@@ -185,37 +187,40 @@ Il file APK potrà essere utilizzato per distribuire l'applicazione. Per poterla
 
 ### Gli strumenti
 
-Avendo avuto esperienze passate, ho deciso di sviluppare un'applicazione Android **nativa**, scegliendo inizialmente come linguaggio di programmazione _Java_, quindi andando ad usare il kit di sviluppo **Android SDK** (un **S**oftware **D**evelopment **K**it, un insieme di strumenti per lo sviluppo e la documentazione software).
+Avendo avuto esperienze passate, ho deciso di sviluppare un'applicazione Android **nativa**, scegliendo inizialmente come linguaggio di programmazione _Java_, sfruttando il kit di sviluppo **Android SDK** (un **S**oftware **D**evelopment **K**it, un insieme di strumenti per lo sviluppo e la documentazione software).
 
 Il kit di sviluppo Android contiene tutte le librerie e i programmi di sviluppo necessari per la compilazione, il test e per il debug delle applicazioni.
 Affiancato all'SDK può essere utilizzato qualsiasi tipo di ambiente di sviluppo (volendo, anche un semplice editor di testo); tuttavia, la miglior integrazione la si ottiene con l'ambiente di sviluppo ufficale, **Android Studio**.
 
-Oltre ad Android Studio, per andare a simulare la risoluzione di piccole e possibili problematiche con Java ho usato IntelliJ IDEA, un IDE diventato famoso negli ultimi anni per le sue caratteristiche d'eccezione, sviluppato dalla software-house JetBrains: infatti, Android Studio non è altro che un _fork_ di IntelliJ IDEA (si parla dell'edizione _Community_, la versione _Ultimate_ è closed-source sotto licenza proprietaria), pesantemente modificato, per renderlo adatto allo sviluppo di applicazioni Android.
+Oltre ad Android Studio, per andare a simulare la risoluzione di piccole e possibili problematiche con Java, ho usato IntelliJ IDEA, un IDE divenuto famoso negli ultimi anni per le sue caratteristiche d'eccezione, sviluppato dalla software-house JetBrains: infatti, Android Studio non è altro che un _fork_ di IntelliJ IDEA (si parla dell'edizione _Community_, la versione _Ultimate_ è closed-source sotto licenza proprietaria), pesantemente modificato, per renderlo adatto allo sviluppo di applicazioni Android.
 
 Rispetto ad altri ambienti, ho trovato utile IntelliJ IDEA per:
 
-* la sua _keymap_ ricca, comoda e completa: infatti, molti sviluppatori riescono ad utilizzare questo programma senza toccare il mouse
+* la sua _keymap_ ricca, comoda e completa: infatti, molti sviluppatori riescono ad utilizzare questo programma senza toccare il mouse (ottimizzazione degli _import_, formattazione automatica ecc.)
 * la sua integrazione con i più famosi strumenti di versioning, tra cui Git; ad esempio, la possibilità di cambiare in pochi click il branch su cui si lavora (ed eventualmente crearne di nuovi), uno strumento di _comparison_ per vedere le modifiche effettuate da un commit all'altro, e tante altre funzionalità utili
 * la sua interfaccia chiara, pulita ed adattabile in base alla situazione
 * uno degli IDE con supporto immediato alle ultime versioni del JDK
-* il suo completamento _"smart"_ (richiamabile mediante ```Cmd + Shift + Spazio```), che suggerisce le classi/i metodi/le variabili più utilizzati nel progetto, basandosi sempre sul **contesto** (per certi versi, somiglia al completamento automatico di Microsoft, impiegato in Visual Studio e Visual Studio Code, IntelliSense)
+* il suo completamento _"smart"_ (richiamabile mediante ```Cmd + Shift + Spazio```), che suggerisce le classi/i metodi/le variabili più utilizzati nel progetto, basandosi sempre sul **contesto** (per certi versi, somiglia al completamento automatico di Microsoft, impiegato in Visual Studio e Visual Studio Code, _IntelliSense_)
 * il suo rilevamento intelligente di codice duplicato o di possibile semplificazione di un'espressione, con tanto di sostituizione automatica
 * il salvataggio automatico, non è più necessario salvare manualmente ogni volta i file (per tornare ad una situazione precedente è sempre possibile mediante la sua sezione dedicata _Local History_)
 * la possibilità di usare altri linguaggi di programmazione oltre a Java, ed arriva con un supporto integrato a molti framework moderni (un esempio è il supporto a Node.JS integrato, quindi c'è anche la possibilità di scrivere anche in JavaScript)
 * il suo supporto inequiparabile a **Kotlin**, il linguaggio di programmazione sviluppato dalla stessa software-house, di cui ne parlerò successivamente
+* _highlight_ (correzione, testo evidenziato) della sintassi SQL in caso di rilevamento query
 
 Essendo suo _fork_, Android Studio riprende tutte queste caratteristiche d'eccezione, e ci affianca dei tool particolarmente utili per lo sviluppo di applicazioni native, tra cui:
 
-* l'Android Device File Explorer, un file explorer particolare che permette di eplorare cartelle normalmente non visibili (se non si dispongono dei permissi di root)
-* l'Android Logcat, ovvero la console da cui è possibile vedere tutti i System.out/err effettuati dalle singole applicazioni
-* il gestore delle macchine virtuali, l'**A**ndroid **V**irtual **D**evice Manager, da dove è possibile creare una macchina virtuale personalizzata, da dove è possibile scegliere:
+* l'Android Device File Explorer, un file explorer particolare che permette di eplorare cartelle normalmente non visibili (se non si dispongono dei permissi di root) mediante il comando ```adb```
+* l'Android Logcat, ovvero la console da cui è possibile vedere tutti i System.out/err effettuati dalle singole applicazioni (è preferibile usare i metodi della classe **Log** del package _android.util_)
+* il gestore delle macchine virtuali, l'**A**ndroid **V**irtual **D**evice Manager, da dove è possibile creare ed avviare una macchina virtuale personalizzata, c'è la possibilità di scegliere per ciascuna macchina:
   * la versione del sistema operativo desisderata
-  * l'architettura desiderata
+  * la risoluzione e le dimensioni dello schermo
+  * l'architettura desiderata:
+    * arm a 32 bit (difficile da emulare su un'architettura di un PC tradizionale, la macchina virtuale risluta particolarmente lenta)
     * è possibile emulare un'architettura x86 solamente se si dispongono di questi requisiti:
       * sistema operativo e processore a 64bit
-      * processore Intel, nel BIOS deve essere abilitata la funzione _Intel Virtualization Technology_
+      * processore Intel, mediante il BIOS deve essere abilitata la funzione _Intel Virtualization Technology_
       * almeno 4GB di ram
-      * è richiesto su macchine con Winows o macOS avere installato il software Intel HAXM, un motore di virtualizzazione assistito dall'hardware che sfrutta la tecnologia Intel VT per migliorare le performance della macchina virtuale (con a bordo un sistema operativo a 32 o 64bit); prima questo software era stato progettato per far parte dell'Android SDK, ma poi si è trasformato in un acceleratore generale per QEMU (il virtualizzatore ed il _machine emulator_ su cui si basa l'AVD)
+      * su macchine con Winows o macOS è richiesta l'installazione del software Intel HAXM, un motore di virtualizzazione assistito dall'hardware che sfrutta la tecnologia _Intel VT_ per migliorare le performance della macchina virtuale (con a bordo un sistema operativo a 32 o 64bit); prima questo software era stato progettato per far parte dell'Android SDK, ma poi si è trasformato in un acceleratore generale per QEMU (il _machine emulator_ su cui si basa AVD)
 
 Prima di Android Studio, gli sviluppatori usavano Eclipse per creare applicazioni Android, il quale sfruttava **Maven** come gestore delle dipendenze (uscito del 2004) e si occupava di eseguire automaticamente le fasi necessarie per la costruzione del file APK. Tuttavia, il tool non risultava abbastanza flessibile con l'evoluzione della programmazione Android, tanto da diventare ad un certo punto difficile e scomodo da usare.
 
@@ -230,13 +235,12 @@ Il meccanismo più potente ed utile di questo linguaggio per raggiungere i miei 
 
 #### Prima versione
 
-Nel codice sorgente della prima versione per la comunicazione con il server e per lo scaricamento dei dati ho usato molte classi e metodologie di approccio ai problemi appartenenti al mondo Java,.
+Nel codice sorgente della prima versione per la comunicazione con il server e per lo scaricamento dei dati ho usato molte classi e metodologie di approccio ai problemi appartenenti al mondo Java.
 
-Un esempio è la procedura di collegamento al server, ho impeigato l'utilizzo di:
+Un esempio è la procedura di collegamento al server, dove ho impeigato l'utilizzo di:
 
 * un oggetto _HttpsURLConnection_ (classe astratta situata nel package _javax.net.ssl_) che rappresenta la connessione con il server
-* un oggetto _BufferedStreamReader_ per leggere il contenuto dell'oggetto InputStream (classe astratta che rappresenta un input stream di bytes, quindi in questo caso contenente la risposta del server alla richiesta sotto forma di bytes) ritornato dall'istanza di HttpsURLConnection, prende in pasto l'inputstream
-* il _BufferedInputStream_ legge solitamente _bytes_, i quali mediante un _charset_ possono essere convertiti in caratteri. Quindi per poterlo leggere (dopo averlo opportunamente istanziato mediante l'InputStream ricevuto) ho impiegato l'utilizzo di un _Reader_, altrimenti sarei rimasto costretto ad interpretare char-per-char mediante il metodo ```read()``` (operazione lentissima e dispendiosa)
+* il _BufferedInputStream_ legge solitamente _bytes_, i quali mediante un _charset_ possono essere convertiti in caratteri. Quindi per poterlo leggere (dopo averlo opportunamente istanziato mediante l'_InputStream_ ricevuto) ho impiegato l'utilizzo di un _Reader_, altrimenti sarei rimasto costretto ad interpretare char-per-char mediante il metodo ```read()``` (operazione lentissima e dispendiosa)
 * un oggetto _BufferedReader_, che richiedeva un _InputStreamReader_, e quest'ultimo prendeva in pasto il BufferedInputStream istanziato precedentemente e il charset su cui doveva basarsi per effettuare la conversione (tutti i charset supportati sono definiti all'interno della classe statica _StandardCharsets_)
   * quest'oggetto offre la possibilità di leggere un'intera riga, e quando si raggiunge la fine dell'InputStream ritorna ```null```
   * mediante l'istanza _StringBuilder_ sono ad aggiungere ogni volta la riga letta (se diversa da ```null```). Le principali motivazioni per cui sono andato ad usare questa classe sono le seguenti:
@@ -250,12 +254,94 @@ Tutte le tabelle richieste e lette andavano a salvarsi su file JSON presenti all
   * l'interruzione dell'applicazione durante lo scaricamento
   * l'interruzione dell'applicazione durante l'elaborazione
   * a volte il processo di elaborazione o di scaricamento falliva, quindi bisognava andare anche a gestire quei determinati casi
-  * mancanza di collegamento ad Internet da parte dell'agente, quindi andare a verificare se vi erano già presenti i file scaricati all'interno del dispositivo (questo perché l'applicazione deve continuare a funzionare anche in assenza di connessione) oppure se ritornare un messaggio di errore che bloccava completamente l'accesso all'applicazione
-  * tante altre casistiche...
-* tutta la procedura veniva eseguita all'interno di un thread separato rispetto al thread dell'UI, quindi sono andato a sfruttare il meccanismo dei **semafori** (come facevo in passato su applicazioni desktop tradizionali Java) per bloccare qualsiasi tocco da parte dell'utente; tuttavia:
-  * dato che andavano a bloccare il thread dell'UI, non potevo far visualizzare alcuna animazione grafica di caricamento
-  * l'intero sistema Android non si trovava particolarmente a suo agio con l'uso dei semafori, e spesso l'uso dei semafori si faceva risentire anche in applicazioni di terze parti, nel launcher di sistema o nel gestore delle notifiche
+  * mancanza di collegamento ad Internet da parte dell'agente, quindi bisognava andare a verificare se vi erano già presenti i file scaricati all'interno del dispositivo (questo perché l'applicazione deve continuare a funzionare anche in assenza di connessione) oppure se ritornare un messaggio di errore che bloccava completamente l'accesso all'applicazione
+  * ...altre casistiche particolari
+* tutta la procedura veniva eseguita all'interno di un thread separato rispetto al thread dell'UI, quindi sono andato a sfruttare il meccanismo dei **semafori** (come facevo in passato su applicazioni desktop tradizionali Java) per far attendere il thread dell'UI la terminazione del thread che si occupava dello scaricamento e dell'elaborazione; tuttavia:
+  * dato che andavano a bloccare il thread dell'UI, non potevo far visualizzare alcuna animazione grafica di caricamento, l'applicazione risultava **congelata** durante questo lasso di tempo
+  * il sistema Android non si trovava particolarmente a suo agio con l'uso dei semafori, e spesso le loro azioni si facevano risentire anche in applicazioni di terze parti, nel launcher di sistema o nel gestore delle notifiche
+
+Le credenziali (per mantenere il login) le andavo a salvare all'interno di un file XML particolare, accessibile solo dall'applicazione appartenente, mediante il comando ```adb``` da terminale o mediante permessi di root; si trovava nel percorso ```/data/data/[package]/shared_prefs/```, ed era accessibile all'interno dell'applicazione mediante l'API **SharedPreferences**. Esistono diverse modalità con cui si può ottenere un oggetto _SharedPreferences_, tra cui quella di sfruttare la classe ```PreferenceManager``` contenente il metodo statico ```getDefaultSharedPreferences(contesto)``` (per contesto si intende l'istanza di una classe che estende _Context_, come l'activity o il contesto dell'appliacazione generale, accessibile mediante il costrutto ```contesto.getApplicationContext()```).
+La peculiarità dell'oggetto _SharedPreferences_ è rappresentata dal fatto che permette la scrittura su uno specifico file XML (contenuto all'interno del percorso sopra indicato) di una piccola _"collezione"_ di coppie chiave-valore (mediante l'oggetto _Editor, e l'eventuale lettura dopo la riapertura dell'applicazione.
+
+In questa versione era possibile scaricare la lista dei clienti dell'agente, i listini di integratori e mangimi disponibili e gli ordini effettuati, mentre era possibile l'invio di visite e ordini (ciascun ordine deve essere composto di almeno un prodotto). Non venne utilizzata dagli agenti.
 
 #### Seconda versione
 
-Nella seconda versione invece, iniziata nel settembre del 2017, dopo essermi documentato adeguatamente sul sito ufficiale [Android Developers](https://developer.android.com/) durante l'estate (al di fuori del lavoro), ho scoperto la possibilità di creare database interni all'applicazione: infatti, lo strato **Java API Framework** mette a disposizione dello sviluppatore
+Nella seconda versione invece, iniziata nel settembre del 2017, dopo essermi documentato adeguatamente sul sito ufficiale [Android Developers](http://developer.android.com/) durante l'estate (al di fuori del lavoro), ho scoperto che il layer **Java API Framework** mette a disposizione una serie di classi e metodi che permettono la creazione di database interni relazionali mediante la libreria integrata **SQLIte**. Quest'ultima, implementa un DBMS SQL di tipo ACID incorporabile da applicazioni.
+
+Per l'acronimo **ACID** si intende l'insieme delle proprietà di cui godono le **transazioni** (unità elementare indivisibile di lavoro):
+
+* **Atomicità**, devono essere resi visibili tutti gli effetti di una transazione, oppure quella transazione non deve avere alcun effetto sulla base di dati (politica _all or nothing_). Non è possibile lasciare la base di dati in uno stato intermedio: se una delle operazioni di lettura o scrittura non può essere portata a compimento, il sistema deve essere in grado di tornare alla situazione iniziale mediante operazioni di _undo_; inoltre, dopo l'esecuzione di un _commit_, il sistema deve assicurare che la transazione lascia la base di dati nel suo stato finale.
+* **Consistenza**, l'esecuzione di un transazione non deve violare i vincoli di integrità definit sulla base di dati: quando il sistema rileva che la transazione sta violando uno dei vincoli deve intervenire per annullarla o per correggere ove possibile la viocazione del vincolo.
+* **Isolamento**, l'esecuzione di una transazione deve essere indipendente dalla contemporanea esecuzione di altre transazioni: si vuole impedire che l'esecuzione di un _rollback_ di una transazione causi il _rollback_ di altre transazioni (effetto domino). In caso di mancata gestione della concorrenza si possono trovare diversi errori:
+  * **Perdita di aggiornamento** dove non viene rilevato l'aggiornamento effettuato da una transazione in un'altra transazione
+  * **Dirty read** dove vi è una dipendenza di una transazione da un'altra non ancora completata con successo (quindi abbiamo una lettura dei dati inconsistente)
+  * **Unrepeteable read** un'analisi inconsistente dei dati da parte di una transazione causata da aggiornamenti prodotti da un'altra
+  * **Phantom read** questo caso si può presentare quando vengono inserite o cancellate tuple che un'altra transazione doveva logicamente considerare
+* **Persistenza** l'effetto di una transazione che ha eseguito il _commit_ non deve essere perso
+
+SQLite è una libreria compatta, veloce (in molti casi riesce a superare MySQL), _open-source_, interpreta il linguaggio SQL ed è multipiattaforma: sono molto probabilmente queste le caratteristiche per cui è stata scelta la sua integrazione all'interno del framework Android.
+Vi sono presenti alcune lacune, tra cui la mancata gestione dei permessi di accesso, demanadata al software che interagisce con il database o al meccanismo dei permessi del file system; inoltre, non ha una vera gestione della concorrenza, che deve essere implementata dal programma che lo utilizza.
+
+Ero andato a creare una classe denominata _DBHelper_, figlia della classe astratta ```SQLiteOpenHelper``` fornita dal framework Java, il cui scopo era quello di facilitare l'accesso al database interno, automatizzando delle operazioni attraverso l'_overload_ di alcuni metodi, tra cui ```onCreate(db:SQLiteDatabase)```, ```onUpgrade(db:SQLiteDatabase, oldVersion:int, newVersion:Int)``` (richiamato quando l'applicazione viene aggiornata, in particolare, quando cambia lo schema del database, ed aumenta la versione del database) ed ```onDowngrade(db:SQLiteDatabase, oldVersion:int, newVersion:Int)``` (ricihiamato solitamente quando si passa ad una versione precedente dell'applicazione, la versione del database "scende"); gli ultimi due metodi citati devono contenere tutte le operazioni necessarie per garantire la persistenza dei dati quando lo schema del database cambia (rimorzione di una colonna, aggiunta di una tabella, modifica di una colonna ecc.).
+
+Ogni volta per andare ad eseguire un'operazione sul database (lettura, scrittura, modifica) andavo a scrivere i comandi manualmente mediante i metodi ```execSQL("INSERT/DELETE/UPDATE")``` e ```rawQuery("QUERY")```(ritornava un oggetto ```Cursor``` con il quale era possibile andare a prelevare i dati al suo interno, scorrendolo con il metodo ```moveToNext()```). Rappresentava comunque un grande passo avanti rispetto alla versione precedente, dato che non dovevo più andare a gestire i file, ed era possibile esprimere più relazioni con minore difficoltà.
+
+La REST API cambiò (seconda revisione), e cambiarono anche i metodi di acesso ai dati: quindi venne rinnovata tutta la parte relativa alla comunicazione con il server.
+Dopo aver rimosso i problematici semafori, ho inziato ad usare la classe astratta _AsyncTask_ integrata nel framework, che mi ha facilitato la gestione delle operazioni in background (in questo caso, il download delle tabelle): questa classe non sostituisce in alcun modo i Thread (non è una libreria di threading), ed è possibile anche specificargli un _timeout_ di esecuzione.
+
+In questa versione ho implementato la registrazione vocale sugli ordini, l'uso della fotocamera per scattare le foto dei timbri aziendali o l'eventuale caricamento di una foto presente all'interno del dispositivo. Con queste funzioni ho docuto prevedere anche la gestione del file system interno, ed assicurare la retro-compatibilità con versioni di Android inferiori a Lollipop.
+
+Per risolvere il problema dell'elaborazione della risposta in tempi troppo lunghi, ho impiegato l'uso della libreria **Apache IO Commons**, che permetteva un'elaborazione fulminea dell'intero InputStream di risposta: successivamente, dopo alcune settimane dal rilascio della versione, il suo impego sui telefoni degli agenti si rilevò disastroso, portando problemi di compatibilità su processori con un certo tipo di architettura (in particolare, sui processori x86 di Intel l'applicazione non poteva essere installata, e su alcuni processori MediaTek) e crash improvvisi dell'intera applicazione. Questa versione rappresentò un vero e proprio **fallimento**.
+
+#### Terza versione
+
+Nel periodo novembre-dicembre, Federico si è occupato di aggiornare il portale e l'API REST (la terza ed ultima grande revisione), portando una maggiore chiarezza sui metodi di accesso alle risorse, ed un miglioramento netto in termini di performace e stabilità, mentre io ho cominciato la scrittura della terza revisione.
+
+Essendo stato un fiasco totale la versione precedente, decisi di riscrivere il codice sorgente da zero, e ne approfittai per inziare a scriverlo interamente in **Kotlin**, il linguaggio di programmazione della software-house JetBrains, divenuto nuovo linguaggio di programmazione **ufficiale** per Android alla conferenza Google I/O 2017 (rimpiazzando Java).
+
+Le caratteristiche che lo contraddistinguono sono le seguenti:
+
+* è al 100% **interoperabile** con le classi e le librerie Java e Android
+* è possibile scrivere il codice in maggiore sicurezza, dato che la sintassi di Kotlin è stata progettata per evitare il più possibile il famoso ```NullPointerException```
+* la parte statica dalla parte dinamica della classe si contraddistingue in maniera più netta, mediante il costrutto ```companion object```: questo perché, rispetto a Java, il ```companion object``` non rappresenta altro che un oggetto fornito con una classe in Kotlin (indipendente dalla parte dinamica: questo oggetto può addirittura estendere classi che non sono estese dalla classe che lo comprende)
+* meccanismi di _delegazione_ (ho affrontato per ora solamente casi semplici; in futuro, espanderò le mie ricerche)
+* leggibile e circonciso, meno codice _boilerplate_ rispetto a Java
+* supporto alle espressioni _lambda_ (introdotte anche su Java nella versione 8)
+* su Android, si può dire addio al metodo ```findViewById(int risorsa)``` (il quale permetteva di usare il componente dichiarato all'interno del file XML di layout)
+* estensione delle funzionalità di un particolare tipo senza andare ad usare il meccanismo dell'ereditarietà
+* consentita la programmazione funzionale
+* può essere compilato in JavaScript (come TypeScript)
+
+Il processo di compilazione, usando questo linguaggio, non cambia in alcun modo: tutto il codice Kotlin, mediante apposito compilatore, viene convertito in bytecode Java in modo tale da poter funzionare su tutti i dispositivi Android (JetBrains sta lavorando al progetto _Kotlin/Native_, per far eseguire in un futuro codice Kotlin senza il supporto della **J**ava **V**irtual **M**achine di _Oracle_).
+
+La libreria problematica _Apache IO Commons_ è stata completamente rimossa, ed è stata sostituita con la classe Scanner: si rilevò sorprendentemente utilie, rilevandosi più veloce la lettura ripetto all'approccio della prima versione, ma non fulminea quanto la seconda; tuttavia, permise di mantenere una certa stabilità e velocità all'interno dell'applicazione.
+
+Tutte le activity sono state rinnovate, permettendo una maggiore modularità rispetto alle versioni precedenti: per esempio, veniva usata una sola activity per la selezione sia di clienti che di prodotti (successivamente si rivelò una cattiva idea in termini di gestione del codice, ma ha funzionato).
+
+Il servizio REST rinnovato non prevedeva l'invio di file multimediali, dato che l'azienda ci ha chiesto prima di concentrarci sul migliorare la ricezione delle tabelle e l'invio dei nuovi ordini/visite; perciò, funzioni che includevano la fotocamera o la registrazione vocale, non sono state incluse.
+
+Per andare ad eliminare codice _boilerplate_ dedicato all'interpretazione del JSON scaricato e alla creazione delle tabelle, all'inserimento e alle interrogazioni, avevo creato una piccola libreria capace di creare query in maniera più dinamica, tuttavia:
+
+* doveva essere qualcosa di standardizzato, e invece, si rivelò utile solamente ai casi di cui avevo bisogno inizialmente (non avevo previsto ad esempio interrogazioni che richiedevano JOIN o selezioni particolari)
+* il processo di creazione e di esecuzione della query non era tanto veloce quanto la scrittura della query manuale
+
+La libreria si basava molto sull'utilizzo delle **interfacce** Java/Kotlin (su Kotlin è possibile andare a dichiarare metodi già definiti al loro interno ed attributi astratti): sono simili alle classi, ma contengono solo dichiarazioni di metodi.
+
+Devo ammettere che inizialmente non riuscivo a dare una giustificazione alla loro esistenza, eppure, si sono rilevate davvero utili nel campo: **la dichiarazione di un metodo garantisce che sarà presente in tutte le sottoclassi**.
+
+La libreria era composta da:
+
+* un'interfaccia, _TableProperties_, contenente una serie di attributi che dovevano essere definito all'interno dei figli
+  * pk, contenente il nome della chiave primaria presente all'interno della mappa
+  * map, una mappa di stringhe, ```Map<String,String>```, contenente il nome della colonna (e del campo all'interno del JSON scaricato) e il tipo della colonna
+  * TABLE_NAME, una stringa contenente il nome della tabella
+  * fks, contenente riferimenti alle classi statiche figlie di TableProperties: infatti, era un'array di TableProperties
+    * il nome della colonna **foreign key** doveva avere lo stesso nome della colonna primary key della tabella padre
+  * alcuni metodi definiti per la creazione/interrogazione di tutte le colonne di una tabella ecc.
+* tanti figli ```object``` (si può definire un _companion object_ con un suo nome, appunto, l'_object_) di TableProperties che definevano i pezzi necessari per costruire le tabelle; si può dire che questi figli avevano lo scopo di **rappresentare** la struttura della loro entità
+* alcune tabelle erano scaricabili, quindi i figli potevano implentare l'interfaccia _Downloadable_ (tra i campi contenuti vi era il nome della funzione da richiedere alla RESTful API)
+* alcune tuple delle tabelle erano inviabili, perciò i figli rappresentanti implementavano l'interfaccia _Uploadable_
+* vi erano anche figli che implementavano entrambe le ultime due interfacce citate (ad esempio, è possibile scaricare la lista dei clienti così com'è possibile inviare un nuovo cliente)
+
+Tutto ciò mi ha permesso di creare un _for_ che scorreva tutti gli ```object``` figli, quindi veniva creata ciascuna tabella se non esisteva (più pulito e leggibile il codice rispetto alla seconda versione), e se implementava la classe _Downloadable_, iniziava anche la procedura di _scaricamento_ e di _salvataggio_.
